@@ -1,6 +1,7 @@
 # Librerias
 import discord
 from discord.ext import commands
+from discord import app_commands
 from colorthief import ColorThief
 import requests
 import asyncio
@@ -47,6 +48,11 @@ class Utility(commands.Cog):
     async def say(self, ctx, *, text):
         await ctx.message.delete()
         await ctx.send(text)
+    
+    # Comando para ver la latencia del bot
+    @commands.command()
+    async def ping(self, ctx):
+        await ctx.send(f"Pong! {round(self.bot.latency * 1000)}ms :ping_pong:")
 
 async def setup(bot):
     await bot.add_cog(Utility(bot))

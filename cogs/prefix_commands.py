@@ -20,10 +20,6 @@ class Prefix_Commands(commands.Cog):
     async def buenosdias(self, ctx):
         await ctx.send(f"Buenos dias {ctx.author.mention} :)")
 
-    # Latencia
-    @commands.command()
-    async def ping(self, ctx):
-        await ctx.send(f"Pong! {round(self.bot.latency * 1000)}ms :ping_pong:")
 
 async def setup(bot):
     await bot.add_cog(Prefix_Commands(bot))

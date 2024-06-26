@@ -1,6 +1,7 @@
 # Librerias
 import discord
 from discord.ext import commands
+from discord import app_commands
 import requests
 from colorthief import ColorThief
 import colorsys
@@ -34,64 +35,59 @@ class Mudae(commands.Cog):
                     ct = ColorThief("img/mudae.png")
                     palette = ct.get_palette(color_count=5)
 
-                    i = 0
-
                     embedImg = discord.Embed(
                         title = lastEmbed['author']['name'],
                         description=f"```$ec {lastEmbed['author']['name']} $#{palette[0][0]:02x}{palette[0][1]:02x}{palette[0][2]:02x}```",
                         color = discord.Color.from_rgb(palette[0][0], palette[0][1], palette[0][2])
                     )
                     embedImg.set_image(url=image)
-                    embedImg.set_footer(text=f"{i+1}")
-                    msg = await ctx.send(embed=embedImg)
+                    embedImg.set_footer(text=f"{1}")
 
-                    atras = "◀️"
-                    adelante = "▶️"
+                    class changeButtons(discord.ui.View):
+                        def __init__(self, author : str, palette : list, url : str):
+                            super().__init__()
+                            self.author = author
+                            self.palette = palette
+                            self.url = url
+                            self.index = 0
 
-                    await msg.add_reaction(atras)
-                    await msg.add_reaction(adelante)
-
-                    tiempo = 0
-
-                    valid_reactions = ['◀️', '▶️']
-
-                    def check(reaction, user):
-                        return user == ctx.author and str(reaction.emoji) in valid_reactions
-                    
-                    while tiempo < 3:
-                        reaction, user = await self.bot.wait_for('reaction_add', timeout=45, check=check)
-                        if reaction != None and user != None:
-                            if str(reaction.emoji) == adelante:
-                                if i >= 4:
-                                    i = 0
-                                else:
-                                    i += 1
-                                tiempo = 0
-                                await msg.remove_reaction(reaction, user)
-                                
-                            if str(reaction.emoji) == atras:
-                                if i <= 0:
-                                    i = 4
-                                else:
-                                    i -= 1
-                                tiempo = 0
-                                await msg.remove_reaction(reaction, user)
-
-                            reaction = None
-                            user = None
+                        @discord.ui.button(emoji='◀️', style=discord.ButtonStyle.grey)
+                        async def changeLeft(self, interaction: discord.Interaction, button: discord.ui.Button):
+                            if self.index <= 0:
+                                self.index = 4
+                            else:
+                                self.index -= 1
 
                             embedImg = discord.Embed(
-                                title = lastEmbed['author']['name'],
-                                description=f"```$ec {lastEmbed['author']['name']} $#{palette[i][0]:02x}{palette[i][1]:02x}{palette[i][2]:02x}```",
-                                color = discord.Color.from_rgb(palette[i][0], palette[i][1], palette[i][2])
+                                title = self.author,
+                                description = f"```$ec {self.author} $#{self.palette[self.index][0]:02x}{self.palette[self.index][1]:02x}{self.palette[self.index][2]:02x}```",
+                                color = discord.Color.from_rgb(self.palette[self.index][0], self.palette[self.index][1], self.palette[self.index][2])
                             )
-                            embedImg.set_image(url=image)
-                            embedImg.set_footer(text=f"{i+1}")
-                            await msg.edit(embed=embedImg)
+                            embedImg.set_image(url=self.url)
+                            embedImg.set_footer(text=f"{self.index+1}")
+
+                            await interaction.response.edit_message(embed=embedImg)
                         
-                        await asyncio.sleep(1)
-                        tiempo += 1
+                        @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
+                        async def changeRight(self, interaction: discord.Interaction, button: discord.ui.Button):
+                            if self.index >= 4:
+                                self.index = 0
+                            else:
+                                self.index += 1
+                                
+                            embedImg = discord.Embed(
+                                title = self.author,
+                                description = f"```$ec {self.author} $#{self.palette[self.index][0]:02x}{self.palette[self.index][1]:02x}{self.palette[self.index][2]:02x}```",
+                                color = discord.Color.from_rgb(self.palette[self.index][0], self.palette[self.index][1], self.palette[self.index][2])
+                            )
+                            embedImg.set_image(url=self.url)
+                            embedImg.set_footer(text=f"{self.index+1}")
+
+                            await interaction.response.edit_message(embed=embedImg)
+
+                    await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image))
                     return
+
 
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
     @commands.command(aliases=['ci'])
