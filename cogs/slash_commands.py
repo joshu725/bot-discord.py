@@ -8,6 +8,7 @@ import random
 from PIL import Image, ImageDraw, ImageFont
 import asyncio
 import colorsys
+from urllib.parse import urlparse
 
 class Slash_Commands(commands.Cog):
     def __init__(self, bot):
@@ -54,6 +55,44 @@ class Slash_Commands(commands.Cog):
     @app_commands.command(name="ping", description="Muestra la latencia del bot")
     async def ping(self, interaction: discord.Interaction):
         await interaction.response.send_message(f"Pong! {round(self.bot.latency * 1000)}ms :ping_pong:")
+
+    # Comando para mandar el enlace de Twitter de manera que los videos y las imagenes puedan visualizarse correctamente
+    @app_commands.command(name="fxtwitter", description="Manda el enlace de Twitter de manera que los videos y las imagenes puedan visualizarse correctamente")
+    @app_commands.describe(enlace = "Enlace de Twitter")
+    async def fxtwitter(self, interaction: discord.Interaction, enlace : str):
+        # Función para verificar validez del enlace y dominio
+        def verificar_enlace(url):
+            try:
+                # Verificar si el dominio es "x.com"
+                parsed_url = urlparse(url)
+                if parsed_url.netloc != "x.com":
+                    return "El enlace no pertenece a 'x.com'"
+                
+                # Encabezados para la solicitud
+                headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
+                }
+                
+                # Verificar si el enlace es válido
+                response = requests.get(url, headers=headers, allow_redirects=True)
+                if response.status_code == 200:
+                    return "El enlace es válido"
+                else:
+                    return f"El enlace no es válido, código de estado: {response.status_code}"
+            except requests.RequestException as e:
+                return f"Ocurrió un error al verificar el enlace: {e}"
+
+        # Verificación del enlace
+        resultado = verificar_enlace(enlace)
+
+        if resultado == "El enlace es válido":
+            transformed_url = enlace.replace("x.com", "fxtwitter.com")
+            await interaction.response.send_message(f"{transformed_url}")
+        else:
+            if resultado == "El enlace no pertenece a 'x.com'":
+                await interaction.response.send_message(embed=discord.Embed(description=f"❌・El enlace no pertenece a Twitter", color=0xdd6879))
+            else:
+                await interaction.response.send_message(embed=discord.Embed(description=f"❌・Enlace inválido", color=0xdd6879))
 
     # --------------------
 
