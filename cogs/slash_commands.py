@@ -284,7 +284,7 @@ class Slash_Commands(commands.Cog):
 
         embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xdd6879)
 
-        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`ping`", inline=True)
+        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`ping`\n`fxtwitter`", inline=True)
         embed.add_field(name=f"Entretenimiento", value="`apuntar`\n`quieres`\n`logro`\n`love`", inline=True)
         embed.add_field(name=f"Mudae", value="\n`embedcolor` (ec)\n`cortarimagen` (ci)", inline=True)
 
