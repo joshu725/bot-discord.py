@@ -26,7 +26,22 @@ class Mudae(commands.Cog):
                 for embed in embeds:
                     lastEmbed = embed.to_dict()
                     image = lastEmbed['image']['url']
-                    with requests.get(image) as r:
+
+                    def ensure_png_extension(image_url):
+                        # Lista de extensiones de imágenes comunes
+                        valid_extensions = ['.png', '.jpg', '.jpeg', '.gif']
+                        
+                        # Verifica si la URL termina con alguna de las extensiones válidas
+                        if not any(image_url.endswith(ext) for ext in valid_extensions):
+                            image_url += '.png'
+                        
+                        return image_url
+
+                    image = ensure_png_extension(image)
+
+                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+                    
+                    with requests.get(image, headers=headers, allow_redirects=True) as r:
                         img_data = r.content
                     with open('img/mudae.png', 'wb') as handler:
                         handler.write(img_data)
@@ -44,11 +59,12 @@ class Mudae(commands.Cog):
                     embedImg.set_footer(text=f"{1}")
 
                     class changeButtons(discord.ui.View):
-                        def __init__(self, author : str, palette : list, url : str):
+                        def __init__(self, author : str, palette : list, url : str, idAutor : int):
                             super().__init__()
                             self.author = author
                             self.palette = palette
                             self.url = url
+                            self.idAutor = idAutor
                             self.index = 0
 
                         @discord.ui.button(emoji='◀️', style=discord.ButtonStyle.grey)
@@ -84,10 +100,16 @@ class Mudae(commands.Cog):
                             embedImg.set_footer(text=f"{self.index+1}")
 
                             await interaction.response.edit_message(embed=embedImg)
+                        
+                        @discord.ui.button(emoji='🗑️', style=discord.ButtonStyle.red)
+                        async def changeDelete(self, interaction: discord.Interaction, button: discord.ui.Button):
+                            if interaction.user.id == self.idAutor:
+                                await interaction.message.delete()
+                            else:
+                                await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
 
-                    await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image))
+                    await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, ctx.author.id))
                     return
-
 
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
     @commands.command(aliases=['ci'])
