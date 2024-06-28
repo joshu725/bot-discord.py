@@ -6,7 +6,7 @@ import requests
 from colorthief import ColorThief
 import colorsys
 import asyncio
-from PIL import Image
+from PIL import Image, ImageSequence
 
 # Clase principal
 class Mudae(commands.Cog):
@@ -111,6 +111,64 @@ class Mudae(commands.Cog):
                     await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, ctx.author.id))
                     return
 
+    # Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae
+    @commands.command(aliases=['cg'])
+    async def cortargif(self, ctx, link = None):
+        async with ctx.message.channel.typing():
+            if link == None:
+                if ctx.message.attachments:
+                    link = ctx.message.attachments[0].url
+                else:
+                    await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0xdd6879))
+                    return
+
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+
+            with requests.get(link, headers=headers, allow_redirects=True) as r:
+                img_data = r.content
+            with open('img/imagen_cortada.gif', 'wb') as handler:
+                handler.write(img_data)
+
+            img = Image.open("img/imagen_cortada.gif")
+
+            width, height = img.size
+
+            aspectratio = 9/14
+
+            widthN = aspectratio * height
+            heightN = width / aspectratio
+
+            if width >= widthN:
+                top = 0
+                bottom = height
+                
+                centerW = width / 2
+
+                left = centerW - (widthN/2)
+                right = centerW + (widthN/2)
+            else:
+                left = 0
+                right = width
+
+                centerH = height / 2
+
+                top = centerH - (heightN/2)
+                bottom = centerH + (heightN/2)
+
+            frames = []
+            for frame in ImageSequence.Iterator(img):
+                frame = frame.crop((left, top, right, bottom))
+                frames.append(frame)
+
+            frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
+
+            await ctx.send(
+                content=f"- **Dimensiones:** {round(right-left)}x{round(bottom-top)}\n- **Recortar manualmente:**\n<https://www.iloveimg.com/crop-image>",
+                file=discord.File("img/imagen_cortada.gif"))
+    @cortargif.error
+    async def cortargif_error(self, ctx, error):
+        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0xdd6879))
+
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
     @commands.command(aliases=['ci'])
     async def cortarimagen(self, ctx, link = None):
@@ -122,12 +180,15 @@ class Mudae(commands.Cog):
                     await ctx.send(embed=discord.Embed(description=f"❌・Inserta una imagen o un enlace", color=0xdd6879))
                     return
 
-            with requests.get(link) as r:
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+
+            with requests.get(link, headers=headers, allow_redirects=True) as r:
                 img_data = r.content
             with open('img/imagen_cortada.png', 'wb') as handler:
                 handler.write(img_data)
 
             img = Image.open("img/imagen_cortada.png")
+
             width, height = img.size
 
             aspectratio = 9/14

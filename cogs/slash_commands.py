@@ -5,7 +5,7 @@ from discord import app_commands
 from colorthief import ColorThief
 import requests
 import random
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageSequence
 import asyncio
 import colorsys
 from urllib.parse import urlparse
@@ -90,9 +90,9 @@ class Slash_Commands(commands.Cog):
             await interaction.response.send_message(f"{transformed_url}")
         else:
             if resultado == "El enlace no pertenece a 'x.com'":
-                await interaction.response.send_message(embed=discord.Embed(description=f"❌・El enlace no pertenece a Twitter", color=0xdd6879))
+                await interaction.response.send_message(embed=discord.Embed(description=f"❌・El enlace no pertenece a Twitter", color=0xdd6879), ephemeral=True)
             else:
-                await interaction.response.send_message(embed=discord.Embed(description=f"❌・Enlace inválido", color=0xdd6879))
+                await interaction.response.send_message(embed=discord.Embed(description=f"❌・Enlace inválido", color=0xdd6879), ephemeral=True)
 
     # --------------------
 
@@ -153,7 +153,7 @@ class Slash_Commands(commands.Cog):
 
             await interaction.response.send_message(file=discord.File("assets/logro_minecraft/minecraft_logro.png"))
         else:
-            await interaction.response.send_message(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xdd6879))
+            await interaction.response.send_message(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xdd6879), ephemeral=True)
     
     # --------------------
 
@@ -257,7 +257,10 @@ class Slash_Commands(commands.Cog):
     @app_commands.command(name="cortarimagen", description="Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae")
     @app_commands.describe(enlace = "Enlace de imagen")
     async def cortarimagen(self, interaction: discord.Interaction, enlace : str):
-        with requests.get(enlace) as r:
+
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+
+        with requests.get(enlace, headers=headers, allow_redirects=True) as r:
             img_data = r.content
         with open('img/imagen_cortada.png', 'wb') as handler:
             handler.write(img_data)
@@ -291,10 +294,62 @@ class Slash_Commands(commands.Cog):
         width, height = img.size
         img = img.save("img/imagen_cortada.png")
 
-        await interaction.response.send_message(content=f"- **Dimensiones:** {round(width)}x{round(height)}\n- **Recortar manualmente:**\n<https://www.iloveimg.com/crop-image>", file=discord.File("img/imagen_cortada.png"))
+        await interaction.response.send_message(content=f"- **Dimensiones:** {round(width)}x{round(height)}\n- **Recortar manualmente:**\n<https://www.iloveimg.com/crop-image>",
+        file=discord.File("img/imagen_cortada.png"))
     @cortarimagen.error
     async def cortarimagen_error(self, interaction: discord.Interaction, error):
-        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Inserta un enlace de una imagen", color=0xdd6879))
+        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Inserta un enlace de una imagen", color=0xdd6879), ephemeral=True)
+
+    # Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae
+    @app_commands.command(name="cortargif", description="Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae")
+    @app_commands.describe(enlace = "Enlace del gif")
+    async def cortargif(self, interaction: discord.Interaction, enlace : str):
+
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+
+        with requests.get(enlace, headers=headers, allow_redirects=True) as r:
+            img_data = r.content
+        with open('img/imagen_cortada.gif', 'wb') as handler:
+            handler.write(img_data)
+
+        img = Image.open("img/imagen_cortada.gif")
+        width, height = img.size
+
+        aspectratio = 9/14
+
+        widthN = aspectratio * height
+        heightN = width / aspectratio
+
+        if width >= widthN:
+            top = 0
+            bottom = height
+            
+            centerW = width / 2
+
+            left = centerW - (widthN/2)
+            right = centerW + (widthN/2)
+        else:
+            left = 0
+            right = width
+
+            centerH = height / 2
+
+            top = centerH - (heightN/2)
+            bottom = centerH + (heightN/2)
+
+        frames = []
+        for frame in ImageSequence.Iterator(img):
+            frame = frame.crop((left, top, right, bottom))
+            frames.append(frame)
+
+        frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
+
+        await interaction.response.send_message(
+            content=f"- **Dimensiones:** {round(right-left)}x{round(bottom-top)}\n- **Recortar manualmente:**\n<https://www.iloveimg.com/crop-image>",
+            file=discord.File("img/imagen_cortada.gif"))
+    @cortargif.error
+    async def cortargif_error(self, interaction: discord.Interaction, error):
+        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Inserta el enlace de un gif", color=0xdd6879), ephemeral=True)
 
     # --------------------
 
