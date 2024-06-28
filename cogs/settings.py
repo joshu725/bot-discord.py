@@ -21,7 +21,7 @@ class Settings(commands.Cog):
 
         embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`ping`\n`fxtwitter`", inline=True)
         embed.add_field(name=f"Entretenimiento", value="`apuntar`\n`quieres`\n`logro`\n`love`", inline=True)
-        embed.add_field(name=f"Mudae", value="\n`embedcolor` (ec)\n`cortarimagen` (ci)", inline=True)
+        embed.add_field(name=f"Mudae", value="\n`embedcolor`\n`cortarimagen`\n`cortargif`", inline=True)
 
         embed.set_image(url="https://i.imgur.com/WPNdviC.png")
         embed.set_footer(text=f"Prefijo: c!", icon_url=ctx.guild.icon)
