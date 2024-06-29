@@ -19,6 +19,17 @@ class Prefix_Commands(commands.Cog):
     @commands.command(aliases=["buendia", "buenosdia"]) # Uso de "aliases"
     async def buenosdias(self, ctx):
         await ctx.send(f"Buenos dias {ctx.author.mention} :)")
+    
+    @commands.command() # Uso de "aliases"
+    async def test(self, ctx):
+        embed = discord.Embed(
+            description="aaaaa"
+        )
+        embed.set_image(url="attachment://img/avatar.png",)
+        await ctx.send(file=discord.File("img/avatar.png", filename="avatar.png"), embed=embed)
+    @test.error
+    async def test_error(self, ctx, error):
+        print(error)
 
 
 async def setup(bot):
