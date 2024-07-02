@@ -278,6 +278,12 @@ class Slash_Commands(commands.Cog):
                         img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
                         img_cortada = img_cortada.save("img/imagen_cortada.png")
 
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
+
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
@@ -296,6 +302,12 @@ class Slash_Commands(commands.Cog):
 
                         img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
                         img_cortada = img_cortada.save("img/imagen_cortada.png")
+
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
 
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.png")],
@@ -325,6 +337,12 @@ class Slash_Commands(commands.Cog):
                         img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
                         img_cortada = img_cortada.save("img/imagen_cortada.png")
 
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
+
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
@@ -343,6 +361,12 @@ class Slash_Commands(commands.Cog):
 
                         img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
                         img_cortada = img_cortada.save("img/imagen_cortada.png")
+
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
 
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.png")],
@@ -392,6 +416,12 @@ class Slash_Commands(commands.Cog):
 
         img_cortada = img_original.crop((left, top, right, bottom))
         img_cortada = img_cortada.save("img/imagen_cortada.png")
+
+        img_cortada = Image.open("img/imagen_cortada.png")
+        img_cortada = img_cortada.resize((225, 350))
+        marco = Image.open("assets/marco.png")
+        img_cortada.paste(marco, (0, 0), marco)
+        img_cortada.save("img/imagen_cortada.png")
 
         if bandera == True:
             await interaction.response.send_message(
@@ -559,9 +589,13 @@ class Slash_Commands(commands.Cog):
 
             bandera = False
 
+        marco = Image.open("assets/marco.png")
+
         frames = []
         for frame in ImageSequence.Iterator(img_original):
             frame = frame.crop((left, top, right, bottom))
+            frame.resize((225, 350))
+            frame.paste(marco, (0, 0), marco)
             frames.append(frame)
 
         frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
