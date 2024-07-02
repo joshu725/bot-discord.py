@@ -441,10 +441,12 @@ class Slash_Commands(commands.Cog):
     @app_commands.command(name="cortargif", description="Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae")
     @app_commands.describe(enlace = "Enlace del gif")
     async def cortargif(self, interaction: discord.Interaction, enlace : str):
+        await interaction.response.defer()
         class cropButtonsW(discord.ui.View):
-            def __init__(self, img_original : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
+            def __init__(self, img_original : Image, marco : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
                 super().__init__()
                 self.img_original = img_original
+                self.marco = marco
                 self.idAutor = idAutor
                 self.left = left
                 self.top = top
@@ -461,13 +463,15 @@ class Slash_Commands(commands.Cog):
                         frames = []
                         for frame in ImageSequence.Iterator(self.img_original):
                             frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
                             frames.append(frame)
 
-                        frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
 
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.gif")],
-                            view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                            view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
                         await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
                 else:
@@ -484,22 +488,25 @@ class Slash_Commands(commands.Cog):
                         frames = []
                         for frame in ImageSequence.Iterator(self.img_original):
                             frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
                             frames.append(frame)
 
-                        frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
 
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.gif")],
-                            view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                            view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
                         await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
                 else:
                     await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
 
         class cropButtonsH(discord.ui.View):
-            def __init__(self, img_original : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
+            def __init__(self, img_original : Image, marco : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
                 super().__init__()
                 self.img_original = img_original
+                self.marco = marco
                 self.idAutor = idAutor
                 self.left = left
                 self.top = top
@@ -516,13 +523,15 @@ class Slash_Commands(commands.Cog):
                         frames = []
                         for frame in ImageSequence.Iterator(self.img_original):
                             frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
                             frames.append(frame)
 
-                        frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
 
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.gif")],
-                            view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                            view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
                         await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
                 else:
@@ -539,13 +548,15 @@ class Slash_Commands(commands.Cog):
                         frames = []
                         for frame in ImageSequence.Iterator(self.img_original):
                             frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
                             frames.append(frame)
 
-                        frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
 
                         await interaction.response.edit_message(
                             attachments=[discord.File("img/imagen_cortada.gif")],
-                            view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                            view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
                         await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
                 else:
@@ -577,6 +588,9 @@ class Slash_Commands(commands.Cog):
             left = centerW - (widthN/2)
             right = centerW + (widthN/2)
 
+            if width % 2 == 0:
+                right -= 1
+
             bandera = True
         else:
             left = 0
@@ -587,27 +601,32 @@ class Slash_Commands(commands.Cog):
             top = centerH - (heightN/2)
             bottom = centerH + (heightN/2)
 
+            if height % 2 == 0:
+                bottom -= 1
+
             bandera = False
 
         marco = Image.open("assets/marco.png")
+        if (right-left) < 225 or (bottom-top) < 350:
+            marco = marco.resize((int(right-left), int(bottom-top)))
 
         frames = []
         for frame in ImageSequence.Iterator(img_original):
             frame = frame.crop((left, top, right, bottom))
-            frame.resize((225, 350))
+            frame.thumbnail((225, 350))
             frame.paste(marco, (0, 0), marco)
             frames.append(frame)
 
-        frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
+        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
 
         if bandera == True:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 file=discord.File("img/imagen_cortada.gif"),
-                view=cropButtonsW(img_original, interaction.user.id, left, top, right, bottom))
+                view=cropButtonsW(img_original, marco, interaction.user.id, left, top, right, bottom))
         else:
-            await interaction.response.send_message(
+            await interaction.followup.send(
                 file=discord.File("img/imagen_cortada.gif"),
-                view=cropButtonsH(img_original, interaction.user.id, left, top, right, bottom))
+                view=cropButtonsH(img_original, marco, interaction.user.id, left, top, right, bottom))
     @cortargif.error
     async def cortargif_error(self, interaction: discord.Interaction, error):
         print(f"Error: {error}")
