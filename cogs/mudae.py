@@ -1,21 +1,50 @@
 # Librerias
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 from discord import app_commands
 import requests
 from colorthief import ColorThief
 import colorsys
 import asyncio
 from PIL import Image, ImageSequence
+from datetime import datetime, timedelta
 
 # Clase principal
 class Mudae(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-    
+        self.comprobarTiempo.start()
+
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{__name__} conectado")
+
+    # Registra el momento en el que se hace correctamente un $bitesthedust requiem
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.id == 432610292342587392 and message.content == "Otro más que muerde el polvo...\nhttps://imgur.com/Fiptqgp.gif" and message.channel.id == 1247267606415806496:
+            f = open("assets/datetime.txt", "w")
+            f.write(str(message.created_at))
+            f.close()
+
+    @tasks.loop(minutes=5.0)
+    async def comprobarTiempo(self):
+        f = open("assets/datetime.txt", "r")
+        time = datetime.strptime(f.read(26), '%Y-%m-%d %H:%M:%S.%f')
+        f.close()
+        
+        time += timedelta(days=14, hours=18)
+        now_time = datetime.now()
+        
+        if now_time > time:
+            channel = await self.bot.fetch_channel(1247267606415806496)
+            
+            embed = discord.Embed(title="Kakera :)", description=f"El siguiente comando está disponible\n```$bitesthedust requiem```", colour=0xa484a6)
+            embed.set_thumbnail(url="https://i.imgur.com/FDBj4Oe.gif")
+            embed.set_image(url="https://imgur.com/Fiptqgp.gif")
+
+            await channel.send("<@263880901094539266> <@235197855529304064>", embed=embed)
+            self.comprobarTiempo.stop()
 
     # Comando para colocar color al embed del bot Mudae
     @commands.command(aliases=['ec'])

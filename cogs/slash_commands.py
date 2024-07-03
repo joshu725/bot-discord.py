@@ -9,6 +9,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageSequence
 import asyncio
 import colorsys
 from urllib.parse import urlparse
+from datetime import datetime, timedelta
 
 class Slash_Commands(commands.Cog):
     def __init__(self, bot):
@@ -252,8 +253,6 @@ class Slash_Commands(commands.Cog):
                             
                     await interaction.response.send_message(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, interaction.user.id))
     
-
-
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
     @app_commands.command(name="cortarimagen", description="Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae")
     @app_commands.describe(enlace = "Enlace de imagen")
@@ -435,7 +434,6 @@ class Slash_Commands(commands.Cog):
     @cortarimagen.error
     async def cortarimagen_error(self, interaction: discord.Interaction, error):
         print(f"Error: {error}")
-
 
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
     @app_commands.command(name="cortargif", description="Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae")
@@ -630,6 +628,30 @@ class Slash_Commands(commands.Cog):
     @cortargif.error
     async def cortargif_error(self, interaction: discord.Interaction, error):
         print(f"Error: {error}")
+
+    # Comando para ver el tiempo exacto que falta para el $bitesthedust requiem
+    @app_commands.command(name="tiemporestante", description="Comando para ver el tiempo exacto que falta para el $bitesthedust requiem")
+    async def tiemporestante(self, interaction: discord.Interaction):
+        f = open("assets/datetime.txt", "r")
+        time = datetime.strptime(f.read(26), '%Y-%m-%d %H:%M:%S.%f')
+        f.close()
+        
+        time += timedelta(days=14, hours=18)
+        
+        now_time = datetime.now()
+        diff = time - now_time
+        
+        dias = diff.days
+        horas = diff.seconds//3600
+        minutos = (diff.seconds//60)%60
+        
+        mudae = await self.bot.fetch_user(432610292342587392)
+        
+        embed = discord.Embed(title="Tiempo restante", description=f"Faltan {dias} días, {horas} horas, y {minutos} minutos para el `$bitesthedust requiem`", colour=0xdd6879)
+        embed.set_thumbnail(url=mudae.avatar)
+        embed.timestamp = time
+        embed.set_footer(text="Fecha", icon_url="https://i.imgur.com/fEH1X8C.png")
+        await interaction.response.send_message(embed=embed)
 
     # --------------------
 
