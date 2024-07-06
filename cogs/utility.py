@@ -1,10 +1,8 @@
 # Librerias
 import discord
 from discord.ext import commands
-from discord import app_commands
 from colorthief import ColorThief
 import requests
-import asyncio
 from urllib.parse import urlparse
 
 # Clase principal

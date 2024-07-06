@@ -1,11 +1,8 @@
 # Librerias
 import discord
 from discord.ext import commands, tasks
-from discord import app_commands
 import requests
 from colorthief import ColorThief
-import colorsys
-import asyncio
 from PIL import Image, ImageSequence
 from datetime import datetime, timedelta
 

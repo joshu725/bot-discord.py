@@ -1,10 +1,10 @@
 # Librerias
 import discord
 from discord.ext import commands
+from discord import app_commands
 import requests
 import random
 from PIL import Image, ImageDraw, ImageFont
-import asyncio
 
 # Clase principal
 class Fun(commands.Cog):
@@ -16,36 +16,38 @@ class Fun(commands.Cog):
         print(f"{__name__} conectado")
 
     # Comando meme "apuntar"
-    @commands.command()
+    @commands.hybrid_command(name="apuntar", description="Comando meme \"apuntar\"  que utiliza el avatar del usuario")
+    @app_commands.describe(member = "Usuario con el que deseas aplicar este comando")
     async def apuntar(self, ctx, member : discord.Member=None):
-        async with ctx.message.channel.typing():
-            if member == None:
-                await descargar_avatar(ctx.author.avatar)
-            else:
-                await descargar_avatar(member.avatar)
-            avatar = Image.open("img/avatar.png")
-            avatar = avatar.resize((512, 512))
-            pistola = Image.open("assets/gun.png")
-            pistola = pistola.resize((200, 200))
-            avatar.paste(pistola, (300, 300), pistola)
-            avatar.save("img/avatar.png")
-            await ctx.send(file=discord.File("img/avatar.png"))
+        await ctx.defer()
+        if member == None:
+            await descargar_avatar(ctx.author.avatar)
+        else:
+            await descargar_avatar(member.avatar)
+        avatar = Image.open("img/avatar.png")
+        avatar = avatar.resize((512, 512))
+        pistola = Image.open("assets/gun.png")
+        pistola = pistola.resize((200, 200))
+        avatar.paste(pistola, (300, 300), pistola)
+        avatar.save("img/avatar.png")
+        await ctx.send(file=discord.File("img/avatar.png"))
     
     # Comando meme "quieres?"
-    @commands.command()
+    @commands.hybrid_command(name="quieres", description="Comando meme \"quieres\" que utiliza el avatar del usuario")
+    @app_commands.describe(member = "Usuario con el que deseas aplicar este comando")
     async def quieres(self, ctx, member : discord.Member=None):
-        async with ctx.message.channel.typing():
-            if member == None:
-                await descargar_avatar(ctx.author.avatar)
-            else:
-                await descargar_avatar(member.avatar)
-            avatar = Image.open("img/avatar.png")
-            avatar = avatar.resize((512, 512))
-            quieres = Image.open("assets/quieres.png")
-            quieres = quieres.resize((512, 512))
-            avatar.paste(quieres, (0, 0), quieres)
-            avatar.save("img/avatar.png")
-            await ctx.send(file=discord.File("img/avatar.png"))
+        await ctx.defer()
+        if member == None:
+            await descargar_avatar(ctx.author.avatar)
+        else:
+            await descargar_avatar(member.avatar)
+        avatar = Image.open("img/avatar.png")
+        avatar = avatar.resize((512, 512))
+        quieres = Image.open("assets/quieres.png")
+        quieres = quieres.resize((512, 512))
+        avatar.paste(quieres, (0, 0), quieres)
+        avatar.save("img/avatar.png")
+        await ctx.send(file=discord.File("img/avatar.png"))
 
     # Comando para determinar aleatoriamente la compatibilidad entre personas
     @commands.command()
@@ -97,36 +99,29 @@ class Fun(commands.Cog):
             await ctx.send(embed=discord.Embed(description=f"**Menciona a dos usuarios para ver su porcentaje de amor**\n\n`c!love @usuario1 @usuario2`", color=0xdd6879))
 
     # Comando para mandar una imagen del logro de Minecraft con los carácteres que indiquemos
-    @commands.command()
-    async def logro(self, ctx, *, texto : str = None):
-        async with ctx.message.channel.typing():
-            if texto == None:
-                await ctx.send(embed=discord.Embed(description=f"**Crea tu propio logro al estilo Minecraft** \n\n`c!logro \"texto\"` (21 carácteres máximo)", color=0xdd6879))
-                return
+    @commands.hybrid_command(name="logro", description="Comando para mandar una imagen del logro de Minecraft con el texto que indiquemos")
+    @app_commands.describe(texto = "Texto a indicar (21 carácteres máximo)")
+    async def logro(self, ctx, texto : str = None):
+        if texto == None:
+            await ctx.send(embed=discord.Embed(description=f"**Crea tu propio logro al estilo Minecraft** \n\n`c!logro \"texto\"` (21 carácteres máximo)", color=0xdd6879))
+            return
 
-            if len(texto) < 22:
-                items = ["apple", "arrow", "bed", "book", "bottled", "bucket", "cake", "charcoal", "chest", "chestplate", "diamond", "furnace", "gold", "grass", "musicdisk", "pickaxe", "sword", "table", "wood", "woodenplank"]
+        if len(texto) < 22:
+            items = ["apple", "arrow", "bed", "book", "bottled", "bucket", "cake", "charcoal", "chest", "chestplate", "diamond", "furnace", "gold", "grass", "musicdisk", "pickaxe", "sword", "table", "wood", "woodenplank"]
+            item_aleatorio = random.choice(items)
+            fondo = Image.open("assets/logro_minecraft/background.png")
+            item = Image.open(f"assets/logro_minecraft/items/{item_aleatorio}.png")
+            font = "assets/logro_minecraft/minecraft-font.ttf"
+            fondo.paste(item, (16, 18), mask=item)
+            draw = ImageDraw.Draw(fondo)
+            fuente = ImageFont.truetype(font, 16)
+            draw.text((56, 11), "Logro desbloqueado", (255, 255, 0), font=fuente)
+            draw.text((56, 34), texto, (255, 255, 255), font=fuente)
+            fondo.save("assets/logro_minecraft/minecraft_logro.png")
 
-                item_aleatorio = random.choice(items)
-
-                fondo = Image.open("assets/logro_minecraft/background.png")
-                item = Image.open(f"assets/logro_minecraft/items/{item_aleatorio}.png")
-
-                font = "assets/logro_minecraft/minecraft-font.ttf"
-
-                fondo.paste(item, (16, 18), mask=item)
-
-                draw = ImageDraw.Draw(fondo)
-                fuente = ImageFont.truetype(font, 16)
-
-                draw.text((56, 11), "Logro desbloqueado", (255, 255, 0), font=fuente)
-                draw.text((56, 34), texto, (255, 255, 255), font=fuente)
-
-                fondo.save("assets/logro_minecraft/minecraft_logro.png")
-
-                await ctx.send(file=discord.File("assets/logro_minecraft/minecraft_logro.png"))
-            else:
-                await ctx.send(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xdd6879))
+            await ctx.send(file=discord.File("assets/logro_minecraft/minecraft_logro.png"))
+        else:
+            await ctx.send(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xdd6879), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Fun(bot))

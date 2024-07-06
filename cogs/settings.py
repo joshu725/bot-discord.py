@@ -33,7 +33,6 @@ class Settings(commands.Cog):
     @commands.command(aliases=['re'])
     @commands.has_permissions(administrator=True)
     async def reload(self, ctx):
-        print("re")
         for filename in os.listdir("cogs"):
             if filename.endswith(".py"):
                 await self.bot.reload_extension(f"cogs.{filename[:-3]}")

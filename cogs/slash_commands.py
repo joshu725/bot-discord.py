@@ -6,12 +6,8 @@ from colorthief import ColorThief
 import requests
 import random
 from PIL import Image, ImageDraw, ImageFont, ImageSequence
-import asyncio
-import colorsys
 from urllib.parse import urlparse
-import urllib.request
 from datetime import datetime, timedelta
-
 from pytube import YouTube
 import pyktok as pyk
 
@@ -135,67 +131,6 @@ class Slash_Commands(commands.Cog):
         pyk.save_tiktok(enlace, True, 'video_data.csv')
         await interaction.followup.send(file=discord.File("video/tiktok.mp4"))
 
-    # --------------------
-
-    # ------- Fun --------
-
-    # Comando meme "apuntar"
-    @app_commands.command(name="apuntar", description="Comando meme \"apuntar\"  que utiliza el avatar del usuario")
-    @app_commands.describe(member = "Usuario con el que deseas aplicar este comando")
-    async def apuntar(self, interaction: discord.Interaction, member : discord.Member=None):
-        if member == None:
-            await descargar_avatar(interaction.user.avatar)
-        else:
-            await descargar_avatar(member.avatar)
-        avatar = Image.open("img/avatar.png")
-        avatar = avatar.resize((512, 512))
-        pistola = Image.open("assets/gun.png")
-        pistola = pistola.resize((200, 200))
-        avatar.paste(pistola, (300, 300), pistola)
-        avatar.save("img/avatar.png")
-        await interaction.response.send_message(file=discord.File("img/avatar.png"))
-
-    # Comando meme "quieres?"
-    @app_commands.command(name="quieres", description="Comando meme \"quieres\" que utiliza el avatar del usuario")
-    @app_commands.describe(member = "Usuario con el que deseas aplicar este comando")
-    async def quieres(self, interaction: discord.Interaction, member : discord.Member=None):
-        if member == None:
-            await descargar_avatar(interaction.user.avatar)
-        else:
-            await descargar_avatar(member.avatar)
-        avatar = Image.open("img/avatar.png")
-        avatar = avatar.resize((512, 512))
-        quieres = Image.open("assets/quieres.png")
-        quieres = quieres.resize((512, 512))
-        avatar.paste(quieres, (0, 0), quieres)
-        avatar.save("img/avatar.png")
-        await interaction.response.send_message(file=discord.File("img/avatar.png"))
-
-    # Comando para mandar una imagen del logro de Minecraft con los carácteres que indiquemos
-    @app_commands.command(name="logro", description="Comando para mandar una imagen del logro de Minecraft con el texto que indiquemos")
-    @app_commands.describe(texto = "Texto a indicar (21 carácteres máximo)")
-    async def logro(self, interaction: discord.Interaction, texto : str = None):
-        if texto == None:
-            await interaction.response.send_message(embed=discord.Embed(description=f"**Crea tu propio logro al estilo Minecraft** \n\n`c!logro \"texto\"` (21 carácteres máximo)", color=0xdd6879))
-            return
-
-        if len(texto) < 22:
-            items = ["apple", "arrow", "bed", "book", "bottled", "bucket", "cake", "charcoal", "chest", "chestplate", "diamond", "furnace", "gold", "grass", "musicdisk", "pickaxe", "sword", "table", "wood", "woodenplank"]
-            item_aleatorio = random.choice(items)
-            fondo = Image.open("assets/logro_minecraft/background.png")
-            item = Image.open(f"assets/logro_minecraft/items/{item_aleatorio}.png")
-            font = "assets/logro_minecraft/minecraft-font.ttf"
-            fondo.paste(item, (16, 18), mask=item)
-            draw = ImageDraw.Draw(fondo)
-            fuente = ImageFont.truetype(font, 16)
-            draw.text((56, 11), "Logro desbloqueado", (255, 255, 0), font=fuente)
-            draw.text((56, 34), texto, (255, 255, 255), font=fuente)
-            fondo.save("assets/logro_minecraft/minecraft_logro.png")
-
-            await interaction.response.send_message(file=discord.File("assets/logro_minecraft/minecraft_logro.png"))
-        else:
-            await interaction.response.send_message(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xdd6879), ephemeral=True)
-    
     # --------------------
 
     # ------ Mudae -------
@@ -705,18 +640,19 @@ class Slash_Commands(commands.Cog):
 
         embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xdd6879)
 
-        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`ping`\n`fxtwitter`\n`reemplazar`", inline=True)
+        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`ping`\n`fxtwitter`\n`reemplazar`\n`descargaryt`", inline=True)
         embed.add_field(name=f"Entretenimiento", value="`apuntar`\n`quieres`\n`logro`\n`love`", inline=True)
         embed.add_field(name=f"Mudae", value="\n`embedcolor`\n`cortarimagen`\n`cortargif`\n`tiemporestante`", inline=True)
 
         embed.set_image(url="https://i.imgur.com/WPNdviC.png")
-        embed.set_footer(text=f"Prefijo: c!", icon_url=interaction.guild.icon)
+        
+        embed.set_footer(text=f"© im.joshi & ninomeow", icon_url=interaction.guild.icon)
         embed.set_thumbnail(url=self.bot.user.avatar)
 
         await interaction.response.send_message(embed=embed)
 
     # --------------------
-    
+
 async def setup(bot):
     await bot.add_cog(Slash_Commands(bot))
 
@@ -726,3 +662,21 @@ async def descargar_avatar(avatar):
         img_data = r.content
     with open('img/avatar.png', 'wb') as handler:
         handler.write(img_data)
+
+""" # Ejemplo de hybrid_command
+
+    @commands.hybrid_command(name="testt", description="Comando meme \"apuntar\"  que utiliza el avatar del usuario")
+    @app_commands.describe(member = "Usuario con el que deseas aplicar este comando")
+    async def testt(self, ctx, member : discord.Member=None):
+        if member == None:
+            await descargar_avatar(ctx.author.avatar)
+        else:
+            await descargar_avatar(member.avatar)
+        avatar = Image.open("img/avatar.png")
+        avatar = avatar.resize((512, 512))
+        pistola = Image.open("assets/gun.png")
+        pistola = pistola.resize((200, 200))
+        avatar.paste(pistola, (300, 300), pistola)
+        avatar.save("img/avatar.png")
+        await ctx.send(file=discord.File("img/avatar.png"))
+"""

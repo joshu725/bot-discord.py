@@ -1,12 +1,8 @@
 # Librerias
 import discord
-from discord.ext import commands, tasks
-from discord import app_commands
-
+from discord.ext import commands
 import os
 import asyncio
-
-# Librerias extra
 from datetime import datetime
 
 # Configuración inicial
