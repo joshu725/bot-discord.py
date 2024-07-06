@@ -18,7 +18,7 @@ class Settings(commands.Cog):
     async def help(self, ctx):
         embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xdd6879)
 
-        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`ping`\n`fxtwitter`\n`reemplazar`\n`descargaryt`", inline=True)
+        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`fxtwitter`\n`reemplazar`\n`youtube`\n`tiktok`", inline=True)
         embed.add_field(name=f"Entretenimiento", value="`apuntar`\n`quieres`\n`logro`\n`love`", inline=True)
         embed.add_field(name=f"Mudae", value="\n`embedcolor`\n`cortarimagen`\n`cortargif`\n`tiemporestante`", inline=True)
 
