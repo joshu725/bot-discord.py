@@ -630,29 +630,6 @@ class Slash_Commands(commands.Cog):
 
     # --------------------
 
-    # ----- Ajustes ------
-
-    
-    # Muestra el avatar tuyo o de la persona que menciones
-    @app_commands.command(name="help", description="Acerca de Choppa")
-    async def help(self, interaction: discord.Interaction):
-        user = await self.bot.fetch_user(235197855529304064)
-
-        embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xdd6879)
-
-        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`ping`\n`fxtwitter`\n`reemplazar`\n`descargaryt`", inline=True)
-        embed.add_field(name=f"Entretenimiento", value="`apuntar`\n`quieres`\n`logro`\n`love`", inline=True)
-        embed.add_field(name=f"Mudae", value="\n`embedcolor`\n`cortarimagen`\n`cortargif`\n`tiemporestante`", inline=True)
-
-        embed.set_image(url="https://i.imgur.com/WPNdviC.png")
-        
-        embed.set_footer(text=f"© im.joshi & ninomeow", icon_url=interaction.guild.icon)
-        embed.set_thumbnail(url=self.bot.user.avatar)
-
-        await interaction.response.send_message(embed=embed)
-
-    # --------------------
-
 async def setup(bot):
     await bot.add_cog(Slash_Commands(bot))
 
