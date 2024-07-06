@@ -5,11 +5,10 @@ from discord import app_commands
 from colorthief import ColorThief
 import requests
 import random
-from PIL import Image, ImageDraw, ImageFont, ImageSequence
+from PIL import Image, ImageSequence
 from urllib.parse import urlparse
 from datetime import datetime, timedelta
-from pytube import YouTube
-import pyktok as pyk
+
 
 class Slash_Commands(commands.Cog):
     def __init__(self, bot):
@@ -18,120 +17,6 @@ class Slash_Commands(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{__name__} conectado")
-
-    # ----- Utilidad -----
-
-    # Muestra el avatar tuyo o de la persona que menciones
-    @app_commands.command(name="avatar", description="Ver el avatar tuyo o de otra persona")
-    @app_commands.describe(member = "Usuario que deseas ver su avatar")
-    async def avatar(self, interaction: discord.Interaction, member: discord.Member = None):
-        bandera = False
-        if member == None:
-            member = interaction.user
-        else:
-            bandera = True
-        
-        with requests.get(member.avatar) as r:
-            img_data = r.content
-        with open('img/avatar.png', 'wb') as handler:
-            handler.write(img_data)
-        
-        ct = ColorThief("img/avatar.png")
-        color = ct.get_color(quality=1)
-
-        show_avatar = discord.Embed(
-            title = member.display_name,
-            description=f"[URL]({member.avatar})",
-            color = discord.Color.from_rgb(color[0], color[1], color[2])
-        )
-        show_avatar.set_image(url=member.avatar)
-        if bandera == True:
-            show_avatar.set_footer(text=f"Solicitado por {interaction.user.display_name}", icon_url=interaction.user.avatar)
-        await interaction.response.send_message(embed=show_avatar)
-    @avatar.error
-    async def avatar_error(self, interaction: discord.Interaction, error):
-        print(error)
-
-    # Comando para ver la latencia del bot
-    @app_commands.command(name="ping", description="Muestra la latencia del bot")
-    async def ping(self, interaction: discord.Interaction):
-        await interaction.response.send_message(f"Pong! {round(self.bot.latency * 1000)}ms :ping_pong:")
-
-    # Comando para mandar el enlace de Twitter de manera que los videos y las imagenes puedan visualizarse correctamente
-    @app_commands.command(name="fxtwitter", description="Manda el enlace de Twitter de manera que los videos y las imagenes puedan visualizarse correctamente")
-    @app_commands.describe(enlace = "Enlace de Twitter")
-    async def fxtwitter(self, interaction: discord.Interaction, enlace : str):
-        # Función para verificar validez del enlace y dominio
-        def verificar_enlace(url):
-            try:
-                # Verificar si el dominio es "x.com"
-                parsed_url = urlparse(url)
-                if parsed_url.netloc != "x.com":
-                    return "El enlace no pertenece a 'x.com'"
-                
-                # Encabezados para la solicitud
-                headers = {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-                }
-                
-                # Verificar si el enlace es válido
-                response = requests.get(url, headers=headers, allow_redirects=True)
-                if response.status_code == 200:
-                    return "El enlace es válido"
-                else:
-                    return f"El enlace no es válido, código de estado: {response.status_code}"
-            except requests.RequestException as e:
-                return f"Ocurrió un error al verificar el enlace: {e}"
-
-        # Verificación del enlace
-        resultado = verificar_enlace(enlace)
-
-        if resultado == "El enlace es válido":
-            transformed_url = enlace.replace("x.com", "fxtwitter.com")
-            await interaction.response.send_message(f"{transformed_url}")
-        else:
-            if resultado == "El enlace no pertenece a 'x.com'":
-                await interaction.response.send_message(embed=discord.Embed(description=f"❌・El enlace no pertenece a Twitter", color=0xdd6879), ephemeral=True)
-            else:
-                await interaction.response.send_message(embed=discord.Embed(description=f"❌・Enlace inválido", color=0xdd6879), ephemeral=True)
-
-    # Comando para reemplazar el texto indicado
-    @app_commands.command(name="reemplazar", description="Comando para reemplazar el texto indicado")
-    @app_commands.describe(texto = "Texto original", textoareemplazar = "Texto a reemplazar", reemplazo = "Reemplazo")
-    async def reemplazar(self, interaction: discord.Interaction, texto : str, textoareemplazar : str, reemplazo : str):
-        await interaction.response.send_message(texto.replace(textoareemplazar, reemplazo))
-
-    # Comando para descargar y enviar un video de Youtube
-    @app_commands.command(name="descargaryt", description="Comando para descargar y enviar un video de Youtube")
-    @app_commands.describe(enlace = "Enlace de Youtube")
-    async def descargaryt(self, interaction: discord.Interaction, enlace : str):
-        try: 
-            yt = YouTube(enlace) 
-        except: 
-            await interaction.response.send_message(embed=discord.Embed(description=f"❌・No se ha encontrado el video", color=0xdd6879), ephemeral=True)
-            return
-        
-        await interaction.response.defer()
-        
-        # Obtener la mejor calidad disponible
-        video = yt.streams.filter(progressive=True, file_extension='mp4').first()
-        
-        try: 
-            video.download(output_path="video", filename="youtube.mp4")
-            await interaction.followup.send(file=discord.File("video/youtube.mp4"))
-        except: 
-            await interaction.followup.send(embed=discord.Embed(description=f"❌・Error al descargar el video", color=0xdd6879))
-
-    # Comando para descargar y enviar un video de TikTok
-    @app_commands.command(name="descargartiktok", description="Comando para descargar y enviar un video de TikTok")
-    @app_commands.describe(enlace = "Enlace de TikTok")
-    async def descargartiktok(self, interaction: discord.Interaction, enlace : str):
-        await interaction.response.defer()
-        pyk.specify_browser('brave')
-        pyk.save_tiktok(enlace, True, 'video_data.csv')
-        await interaction.followup.send(file=discord.File("video/tiktok.mp4"))
-
-    # --------------------
 
     # ------ Mudae -------
 
