@@ -1,6 +1,7 @@
 # Librerias
 import discord
 from discord.ext import commands, tasks
+from discord import app_commands
 import requests
 from colorthief import ColorThief
 from PIL import Image, ImageSequence
@@ -24,6 +25,7 @@ class Mudae(commands.Cog):
             f.write(str(message.created_at))
             f.close()
 
+    # Cada 5 minutos se comprueba que la fecha actual sea mayor a la fecha indicada en 'datetime.txt' + 15 dias
     @tasks.loop(minutes=5.0)
     async def comprobarTiempo(self):
         f = open("assets/datetime.txt", "r")
@@ -44,7 +46,7 @@ class Mudae(commands.Cog):
             self.comprobarTiempo.stop()
 
     # Comando para colocar color al embed del bot Mudae
-    @commands.command(aliases=['ec'])
+    @commands.hybrid_command(name="embedcolor", description="Comando para colocar color al embed del personaje en el bot Mudae", aliases=['ec'])
     async def embedcolor(self, ctx):
         async for message in ctx.channel.history(limit=100):
             if message.author.id == 432610292342587392:
@@ -133,120 +135,428 @@ class Mudae(commands.Cog):
                                 await interaction.message.delete()
                             else:
                                 await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
-
+                            
                     await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, ctx.author.id))
-                    return
-
-    # Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae
-    @commands.command(aliases=['cg'])
-    async def cortargif(self, ctx, link = None):
-        async with ctx.message.channel.typing():
-            if link == None:
-                if ctx.message.attachments:
-                    link = ctx.message.attachments[0].url
-                else:
-                    await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0xdd6879))
-                    return
-
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-
-            with requests.get(link, headers=headers, allow_redirects=True) as r:
-                img_data = r.content
-            with open('img/imagen_cortada.gif', 'wb') as handler:
-                handler.write(img_data)
-
-            img = Image.open("img/imagen_cortada.gif")
-
-            width, height = img.size
-
-            aspectratio = 9/14
-
-            widthN = aspectratio * height
-            heightN = width / aspectratio
-
-            if width >= widthN:
-                top = 0
-                bottom = height
-                
-                centerW = width / 2
-
-                left = centerW - (widthN/2)
-                right = centerW + (widthN/2)
-            else:
-                left = 0
-                right = width
-
-                centerH = height / 2
-
-                top = centerH - (heightN/2)
-                bottom = centerH + (heightN/2)
-
-            frames = []
-            for frame in ImageSequence.Iterator(img):
-                frame = frame.crop((left, top, right, bottom))
-                frames.append(frame)
-
-            frames[0].save('img/imagen_cortada.gif', save_all=True, append_images=frames[1:], loop=0)
-
-            await ctx.send(
-                content=f"- **Dimensiones:** {round(right-left)}x{round(bottom-top)}\n- **Recortar manualmente:**\n<https://www.iloveimg.com/crop-image>",
-                file=discord.File("img/imagen_cortada.gif"))
-    @cortargif.error
-    async def cortargif_error(self, ctx, error):
-        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0xdd6879))
+    @embedcolor.error
+    async def embedcolor_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=discord.Embed(description=f"❌・No se ha encontrado un mensaje `embed` de Mudae", color=0xdd6879))
 
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
-    @commands.command(aliases=['ci'])
-    async def cortarimagen(self, ctx, link = None):
-        async with ctx.message.channel.typing():
-            if link == None:
-                if ctx.message.attachments:
-                    link = ctx.message.attachments[0].url
+    @commands.hybrid_command(name="cortarimagen", description="Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae", aliases=['ci'])
+    @app_commands.describe(enlace = "Enlace de imagen")
+    async def cortarimagen(self, ctx, enlace : str = None):
+        class cropButtonsW(discord.ui.View):
+            def __init__(self, img_original : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
+                super().__init__()
+                self.img_original = img_original
+                self.idAutor = idAutor
+                self.left = left
+                self.top = top
+                self.right = right
+                self.bottom = bottom
+
+            @discord.ui.button(emoji='◀️', style=discord.ButtonStyle.grey)
+            async def cropLeft(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.left > 25:
+                        self.left -= 25
+                        self.right -= 25
+
+                        img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
+                        img_cortada = img_cortada.save("img/imagen_cortada.png")
+
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
+
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.png")],
+                            view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
                 else:
-                    await ctx.send(embed=discord.Embed(description=f"❌・Inserta una imagen o un enlace", color=0xdd6879))
-                    return
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
+                    
+            
+            @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
+            async def cropRight(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.right < self.img_original.size[0] - 25:
+                        self.left += 25
+                        self.right += 25
 
-            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+                        img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
+                        img_cortada = img_cortada.save("img/imagen_cortada.png")
 
-            with requests.get(link, headers=headers, allow_redirects=True) as r:
-                img_data = r.content
-            with open('img/imagen_cortada.png', 'wb') as handler:
-                handler.write(img_data)
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
 
-            img = Image.open("img/imagen_cortada.png")
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.png")],
+                            view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
 
-            width, height = img.size
+        class cropButtonsH(discord.ui.View):
+            def __init__(self, img_original : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
+                super().__init__()
+                self.img_original = img_original
+                self.idAutor = idAutor
+                self.left = left
+                self.top = top
+                self.right = right
+                self.bottom = bottom
 
-            aspectratio = 9/14
+            @discord.ui.button(emoji='🔼', style=discord.ButtonStyle.grey)
+            async def cropTop(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.top > 25:
+                        self.top -= 25
+                        self.bottom -= 25
 
-            widthN = aspectratio * height
-            heightN = width / aspectratio
+                        img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
+                        img_cortada = img_cortada.save("img/imagen_cortada.png")
 
-            if width >= widthN:
-                top = 0
-                bottom = height
-                
-                centerW = width / 2
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
 
-                left = centerW - (widthN/2)
-                right = centerW + (widthN/2)
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.png")],
+                            view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
+                    
+            
+            @discord.ui.button(emoji='🔽', style=discord.ButtonStyle.grey)
+            async def cropBottom(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.bottom < self.img_original.size[1] - 25:
+                        self.top += 25
+                        self.bottom += 25
+
+                        img_cortada = self.img_original.crop((self.left, self.top, self.right, self.bottom))
+                        img_cortada = img_cortada.save("img/imagen_cortada.png")
+
+                        img_cortada = Image.open("img/imagen_cortada.png")
+                        img_cortada = img_cortada.resize((225, 350))
+                        marco = Image.open("assets/marco.png")
+                        img_cortada.paste(marco, (0, 0), marco)
+                        img_cortada.save("img/imagen_cortada.png")
+
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.png")],
+                            view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
+
+        if enlace == None:
+            if ctx.message.attachments:
+                enlace = ctx.message.attachments[0].url
             else:
-                left = 0
-                right = width
+                await ctx.send(embed=discord.Embed(description=f"❌・Inserta una imagen o un enlace", color=0xdd6879))
+                return
 
-                centerH = height / 2
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
-                top = centerH - (heightN/2)
-                bottom = centerH + (heightN/2)
+        with requests.get(enlace, headers=headers, allow_redirects=True) as r:
+            img_data = r.content
+        with open('img/imagen_original.png', 'wb') as handler:
+            handler.write(img_data)
 
-            img = img.crop((left, top, right, bottom))
-            width, height = img.size
-            img = img.save("img/imagen_cortada.png")
+        img_original = Image.open("img/imagen_original.png")
+        width, height = img_original.size
 
-            await ctx.send(content=f"- **Dimensiones:** {round(width)}x{round(height)}\n- **Recortar manualmente:**\n<https://www.iloveimg.com/crop-image>", file=discord.File("img/imagen_cortada.png"))
+        aspectratio = 9/14
+
+        widthN = aspectratio * height
+        heightN = width / aspectratio
+
+        bandera = False
+
+        if width >= widthN:
+            top = 0
+            bottom = height
+            
+            centerW = width / 2
+
+            left = centerW - (widthN/2)
+            right = centerW + (widthN/2)
+
+            bandera = True
+        else:
+            left = 0
+            right = width
+
+            centerH = height / 2
+
+            top = centerH - (heightN/2)
+            bottom = centerH + (heightN/2)
+
+            bandera = False
+
+        img_cortada = img_original.crop((left, top, right, bottom))
+        img_cortada = img_cortada.save("img/imagen_cortada.png")
+
+        img_cortada = Image.open("img/imagen_cortada.png")
+        img_cortada = img_cortada.resize((225, 350))
+        marco = Image.open("assets/marco.png")
+        img_cortada.paste(marco, (0, 0), marco)
+        img_cortada.save("img/imagen_cortada.png")
+
+        if bandera == True:
+            await ctx.send(
+                file=discord.File("img/imagen_cortada.png"),
+                view=cropButtonsW(img_original, ctx.author.id, left, top, right, bottom))
+            
+        else:
+            await ctx.send(
+                file=discord.File("img/imagen_cortada.png"),
+                view=cropButtonsH(img_original, ctx.author.id, left, top, right, bottom))
     @cortarimagen.error
     async def cortarimagen_error(self, ctx, error):
+        print(error)
         await ctx.send(embed=discord.Embed(description=f"❌・Inserta una imagen o un enlace", color=0xdd6879))
+
+    # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
+    @commands.hybrid_command(name="cortargif", description="Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae", aliases=['cg'])
+    @app_commands.describe(enlace = "Enlace del gif")
+    async def cortargif(self, ctx, enlace : str = None):
+        await ctx.defer()
+        class cropButtonsW(discord.ui.View):
+            def __init__(self, img_original : Image, marco : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
+                super().__init__()
+                self.img_original = img_original
+                self.marco = marco
+                self.idAutor = idAutor
+                self.left = left
+                self.top = top
+                self.right = right
+                self.bottom = bottom
+
+            @discord.ui.button(emoji='◀️', style=discord.ButtonStyle.grey)
+            async def cropLeft(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.left > 25:
+                        self.left -= 25
+                        self.right -= 25
+
+                        frames = []
+                        for frame in ImageSequence.Iterator(self.img_original):
+                            frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
+                            frames.append(frame)
+
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
+
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.gif")],
+                            view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
+                    
+            
+            @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
+            async def cropRight(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.right < self.img_original.size[0] - 25:
+                        self.left += 25
+                        self.right += 25
+
+                        frames = []
+                        for frame in ImageSequence.Iterator(self.img_original):
+                            frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
+                            frames.append(frame)
+
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
+
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.gif")],
+                            view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
+
+        class cropButtonsH(discord.ui.View):
+            def __init__(self, img_original : Image, marco : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
+                super().__init__()
+                self.img_original = img_original
+                self.marco = marco
+                self.idAutor = idAutor
+                self.left = left
+                self.top = top
+                self.right = right
+                self.bottom = bottom
+
+            @discord.ui.button(emoji='🔼', style=discord.ButtonStyle.grey)
+            async def cropTop(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.top > 25:
+                        self.top -= 25
+                        self.bottom -= 25
+
+                        frames = []
+                        for frame in ImageSequence.Iterator(self.img_original):
+                            frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
+                            frames.append(frame)
+
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
+
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.gif")],
+                            view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
+                    
+            
+            @discord.ui.button(emoji='🔽', style=discord.ButtonStyle.grey)
+            async def cropBottom(self, interaction: discord.Interaction, button: discord.ui.Button):
+                if interaction.user.id == self.idAutor:
+                    if self.bottom < self.img_original.size[1] - 25:
+                        self.top += 25
+                        self.bottom += 25
+
+                        frames = []
+                        for frame in ImageSequence.Iterator(self.img_original):
+                            frame = frame.crop((self.left, self.top, self.right, self.bottom))
+                            frame.thumbnail((225, 350))
+                            frame.paste(self.marco, (0, 0), self.marco)
+                            frames.append(frame)
+
+                        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
+
+                        await interaction.response.edit_message(
+                            attachments=[discord.File("img/imagen_cortada.gif")],
+                            view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
+                    else:
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0xdd6879), ephemeral=True)
+                else:
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
+
+        if enlace == None:
+            if ctx.message.attachments:
+                enlace = ctx.message.attachments[0].url
+            else:
+                await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0xdd6879))
+                return
+
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+
+        with requests.get(enlace, headers=headers, allow_redirects=True) as r:
+            img_data = r.content
+        with open('img/imagen_original.gif', 'wb') as handler:
+            handler.write(img_data)
+
+        img_original = Image.open("img/imagen_original.gif")
+        width, height = img_original.size
+
+        aspectratio = 9/14
+
+        widthN = aspectratio * height
+        heightN = width / aspectratio
+
+        bandera = False
+
+        if width >= widthN:
+            top = 0
+            bottom = height
+            
+            centerW = width / 2
+
+            left = centerW - (widthN/2)
+            right = centerW + (widthN/2)
+
+            if width % 2 == 0:
+                right -= 1
+
+            bandera = True
+        else:
+            left = 0
+            right = width
+
+            centerH = height / 2
+
+            top = centerH - (heightN/2)
+            bottom = centerH + (heightN/2)
+
+            if height % 2 == 0:
+                bottom -= 1
+
+            bandera = False
+
+        marco = Image.open("assets/marco.png")
+        if (right-left) < 225 or (bottom-top) < 350:
+            marco = marco.resize((int(right-left), int(bottom-top)))
+
+        frames = []
+        for frame in ImageSequence.Iterator(img_original):
+            frame = frame.crop((left, top, right, bottom))
+            frame.thumbnail((225, 350))
+            frame.paste(marco, (0, 0), marco)
+            frames.append(frame)
+
+        frames[1].save('img/imagen_cortada.gif', save_all=True, append_images=frames[2:], loop=0)
+
+        if bandera == True:
+            await ctx.send(
+                file=discord.File("img/imagen_cortada.gif"),
+                view=cropButtonsW(img_original, marco, ctx.author.id, left, top, right, bottom))
+        else:
+            await ctx.send(
+                file=discord.File("img/imagen_cortada.gif"),
+                view=cropButtonsH(img_original, marco, ctx.author.id, left, top, right, bottom))
+    @cortargif.error
+    async def cortargif_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0xdd6879))
+
+    # Comando para ver el tiempo exacto que falta para el $bitesthedust requiem
+    @commands.hybrid_command(name="tiemporestante", description="Comando para ver el tiempo exacto que falta para el $bitesthedust requiem", aliases=['tr'])
+    async def tiemporestante(self, ctx):
+        f = open("assets/datetime.txt", "r")
+        time = datetime.strptime(f.read(26), '%Y-%m-%d %H:%M:%S.%f')
+        f.close()
+        
+        time += timedelta(days=14, hours=18)
+        
+        now_time = datetime.now()
+        diff = time - now_time
+        
+        dias = diff.days
+        horas = diff.seconds//3600
+        minutos = (diff.seconds//60)%60
+        
+        mudae = await self.bot.fetch_user(432610292342587392)
+        
+        embed = discord.Embed(title="Tiempo restante", description=f"Faltan {dias} días, {horas} horas, y {minutos} minutos para el `$bitesthedust requiem`", colour=0xdd6879)
+        embed.set_thumbnail(url=mudae.avatar)
+        embed.timestamp = time
+        embed.set_footer(text="Fecha", icon_url="https://i.imgur.com/fEH1X8C.png")
+        await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(Mudae(bot))
