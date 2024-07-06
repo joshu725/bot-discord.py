@@ -9,7 +9,11 @@ from PIL import Image, ImageDraw, ImageFont, ImageSequence
 import asyncio
 import colorsys
 from urllib.parse import urlparse
+import urllib.request
 from datetime import datetime, timedelta
+
+from pytube import YouTube
+import pyktok as pyk
 
 class Slash_Commands(commands.Cog):
     def __init__(self, bot):
@@ -100,6 +104,36 @@ class Slash_Commands(commands.Cog):
     @app_commands.describe(texto = "Texto original", textoareemplazar = "Texto a reemplazar", reemplazo = "Reemplazo")
     async def reemplazar(self, interaction: discord.Interaction, texto : str, textoareemplazar : str, reemplazo : str):
         await interaction.response.send_message(texto.replace(textoareemplazar, reemplazo))
+
+    # Comando para descargar y enviar un video de Youtube
+    @app_commands.command(name="descargaryt", description="Comando para descargar y enviar un video de Youtube")
+    @app_commands.describe(enlace = "Enlace de Youtube")
+    async def descargaryt(self, interaction: discord.Interaction, enlace : str):
+        try: 
+            yt = YouTube(enlace) 
+        except: 
+            await interaction.response.send_message(embed=discord.Embed(description=f"❌・No se ha encontrado el video", color=0xdd6879), ephemeral=True)
+            return
+        
+        await interaction.response.defer()
+        
+        # Obtener la mejor calidad disponible
+        video = yt.streams.filter(progressive=True, file_extension='mp4').first()
+        
+        try: 
+            video.download(output_path="video", filename="youtube.mp4")
+            await interaction.followup.send(file=discord.File("video/youtube.mp4"))
+        except: 
+            await interaction.followup.send(embed=discord.Embed(description=f"❌・Error al descargar el video", color=0xdd6879))
+
+    # Comando para descargar y enviar un video de TikTok
+    @app_commands.command(name="descargartiktok", description="Comando para descargar y enviar un video de TikTok")
+    @app_commands.describe(enlace = "Enlace de TikTok")
+    async def descargartiktok(self, interaction: discord.Interaction, enlace : str):
+        await interaction.response.defer()
+        pyk.specify_browser('brave')
+        pyk.save_tiktok(enlace, True, 'video_data.csv')
+        await interaction.followup.send(file=discord.File("video/tiktok.mp4"))
 
     # --------------------
 
