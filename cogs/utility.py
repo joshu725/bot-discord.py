@@ -146,5 +146,17 @@ class Utility(commands.Cog):
     async def tiktok_error(self, ctx, error):
         await ctx.send(embed=discord.Embed(description=f"❌・Error al descargar el video", color=0xdd6879), ephemeral=True)
 
+    # Comando para visualizar en grande un emoji
+    @commands.hybrid_command(name="emoji", description="Comando para visualizar en grande un emoji", aliases=["e"])
+    @app_commands.describe(emoji = "Enlace de TikTok")
+    async def emoji(self, ctx, emoji : discord.Emoji):
+        embed=discord.Embed(title=f":{emoji.name}:", description=f"[URL]({emoji.url})", color = discord.Color(0xdd6879))
+        embed.set_image(url=f"{emoji.url}")
+        await ctx.send(embed=embed)
+    @emoji.error
+    async def emoji_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=discord.Embed(description=f"❌・Ingresa un emoji custom", color=0xdd6879), ephemeral=True)
+
 async def setup(bot):
     await bot.add_cog(Utility(bot))

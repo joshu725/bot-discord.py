@@ -20,7 +20,7 @@ async def on_ready():
     hora = datetime.now()
     print(hora.strftime("      Hora actual: %H:%M:%S\n"))
 
-    await bot.change_presence(activity=discord.Game(name="🍧 c!help"))
+    await bot.change_presence(activity=discord.Game(name="🥼 !help 🦌"))
     
     try:
         synced = await bot.tree.sync()
