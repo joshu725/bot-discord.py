@@ -7,6 +7,8 @@ import requests
 from urllib.parse import urlparse
 from pytube import YouTube
 import pyktok as pyk
+import instaloader
+import os
 
 # Clase principal
 class Utility(commands.Cog):
@@ -146,9 +148,43 @@ class Utility(commands.Cog):
     async def tiktok_error(self, ctx, error):
         await ctx.send(embed=discord.Embed(description=f"❌・Error al descargar el video", color=0xdd6879), ephemeral=True)
 
-    # Comando para visualizar en grande un emoji
-    @commands.hybrid_command(name="emoji", description="Comando para visualizar en grande un emoji", aliases=["e"])
-    @app_commands.describe(emoji = "Enlace de TikTok")
+    # Comando para descargar y enviar un reel de Instagram
+    @commands.hybrid_command(name="reel", description="Comando para descargar y enviar un reel de Instagram")
+    @app_commands.describe(enlace = "Enlace del reel")
+    async def reel(self, ctx, enlace : str):
+        await ctx.defer()
+        
+        # Crear una instancia de Instaloader
+        reel = instaloader.Instaloader()
+        
+        # Extraer el shortcode de la URL
+        shortcode = enlace.split("/")[-2]
+
+        # Descargar el video
+        post = instaloader.Post.from_shortcode(reel.context, shortcode)
+        reel.download_post(post, "download")
+        
+        # Se elimina el anterior video
+        if os.path.exists("video/instagram/reel.mp4"):
+            os.remove("video/instagram/reel.mp4")
+
+        # Se renombra y se mueve el video, ademas de borrar los demás archivos innecesarios
+        for file in os.listdir("download"):
+            if file.endswith(".mp4"):
+                os.rename(os.path.join("download", file), "video/instagram/reel.mp4")
+            else:
+                os.remove(os.path.join("download", file))
+        os.rmdir("download")
+        
+        await ctx.send(file=discord.File("video/instagram/reel.mp4"))
+    @reel.error
+    async def reel_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un enlace de un video de Instagram", color=0xdd6879), ephemeral=True)
+
+    # Comando para visualizar en grande un emoji custom
+    @commands.hybrid_command(name="emoji", description="Comando para visualizar en grande un emoji custom", aliases=["e"])
+    @app_commands.describe(emoji = "Emoji custom")
     async def emoji(self, ctx, emoji : discord.Emoji):
         embed=discord.Embed(title=f":{emoji.name}:", description=f"[URL]({emoji.url})", color = discord.Color(0xdd6879))
         embed.set_image(url=f"{emoji.url}")
