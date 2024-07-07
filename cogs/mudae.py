@@ -137,6 +137,7 @@ class Mudae(commands.Cog):
                                 await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0xdd6879), ephemeral=True)
                             
                     await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, ctx.author.id))
+                    return
     @embedcolor.error
     async def embedcolor_error(self, ctx, error):
         print(error)
