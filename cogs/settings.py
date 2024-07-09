@@ -20,7 +20,7 @@ class Settings(commands.Cog):
 
         embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`emoji`\n`fxtwitter`\n`reemplazar`\n`youtube`\n`tiktok`\n`reel`", inline=True)
         embed.add_field(name=f"Entretenimiento", value="`apuntar`\n`quieres`\n`logro`\n`love`", inline=True)
-        embed.add_field(name=f"Mudae", value="\n`embedcolor`\n`cortarimagen`\n`cortargif`\n`tiemporestante`", inline=True)
+        embed.add_field(name=f"Mudae", value="\n`embedcolor`\n`cortarimagen`\n`cortargif`\n`tiemporestante`\n`imgur`", inline=True)
 
         embed.set_image(url="https://i.imgur.com/WPNdviC.png")
         
