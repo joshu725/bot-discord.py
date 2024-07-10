@@ -16,14 +16,14 @@ class Settings(commands.Cog):
     # Muestra el avatar tuyo o de la persona que menciones
     @commands.hybrid_command(name="help", description="Acerca de Choppa")
     async def help(self, ctx):
-        embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xdd6879)
+        embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xae7163)
 
-        embed.add_field(name=f"Utilidad", value="`avatar`\n`say`\n`emoji`\n`fxtwitter`\n`reemplazar`\n`youtube`\n`tiktok`\n`reel`", inline=True)
-        embed.add_field(name=f"Entretenimiento", value="`apuntar`\n`quieres`\n`logro`\n`love`", inline=True)
-        embed.add_field(name=f"Mudae", value="\n`embedcolor`\n`cortarimagen`\n`cortargif`\n`tiemporestante`\n`imgur`", inline=True)
+        embed.add_field(name=f"🔧 Utilidad", value="`avatar`, `say`, `emoji`, `fxtwitter`, `reemplazar`, `youtube`, `tiktok`, `reel`, `instaimg`, `imgur`", inline=False)
+        embed.add_field(name=f"🎨 Entretenimiento", value="`apuntar`, `quieres`, `logro`, `love`", inline=False)
+        embed.add_field(name=f"<:kakera:1260465357085474968> Mudae", value="`embedcolor`, `cortarimagen`, `cortargif`, `tiemporestante`", inline=False)
 
-        embed.set_image(url="https://i.imgur.com/WPNdviC.png")
-        
+        embed.set_image(url="https://i.imgur.com/SOZfVMH.jpeg")
+
         embed.set_footer(text=f"© im.joshi & ninomeow", icon_url=ctx.guild.icon)
         embed.set_thumbnail(url=self.bot.user.avatar)
 
@@ -39,6 +39,18 @@ class Settings(commands.Cog):
                 await ctx.message.add_reaction('✅')
     @reload.error
     async def reload_error(self, ctx, error):
+        print(error)
+        await ctx.message.add_reaction('❌')
+        
+    # Comando para recargar los slash
+    @commands.command(aliases=['rs'])
+    @commands.has_permissions(administrator=True)
+    async def reloadslash(self, ctx):
+        synced = await self.bot.tree.sync()
+        print(f"\nComandos slash sincronizados: {len(synced)}\n")
+        await ctx.message.add_reaction('✅')
+    @reloadslash.error
+    async def reloadslash_error(self, ctx, error):
         print(error)
         await ctx.message.add_reaction('❌')
 

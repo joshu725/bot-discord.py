@@ -558,32 +558,5 @@ class Mudae(commands.Cog):
         embed.set_footer(text="Fecha", icon_url="https://i.imgur.com/fEH1X8C.png")
         await ctx.send(embed=embed)
 
-    # Comando para subir enlace de imagen o gif a Imgur
-    @commands.hybrid_command(name="imgur", description="Comando para subir enlace de imagen o gif a Imgur")
-    @app_commands.describe(enlace = "Enlace de la imagen o gif")
-    async def imgur(self, ctx, enlace : str):
-        await ctx.defer()
-        with open("assets/imgur-clientid.txt") as file:
-            client_id = file.read()
-        headers = {"Authorization": f"Client-ID {client_id}"}
-        data = {"image": enlace}
-
-        response = requests.post("https://api.imgur.com/3/upload", headers=headers, data=data)
-
-        if response.status_code == 200:
-            imgur_link = response.json()['data']['link']
-            embed = discord.Embed(
-                description=f"```{imgur_link}```",
-                color = discord.Color(0x33bebe)
-            )
-            embed.set_image(url=imgur_link)
-            await ctx.send(embed=embed)
-        else:
-            await ctx.send(embed=discord.Embed(description=f"❌・No se ha podido subir el enlace", color=0xdd6879))
-    @imgur.error
-    async def imgur_error(self, ctx, error):
-        print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・Proporciona un enlace", color=0xdd6879))
-
 async def setup(bot):
     await bot.add_cog(Mudae(bot))

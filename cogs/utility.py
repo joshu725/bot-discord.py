@@ -165,18 +165,23 @@ class Utility(commands.Cog):
         reel.download_post(post, "download")
         
         # Se elimina el anterior video
-        if os.path.exists("video/instagram/reel.mp4"):
-            os.remove("video/instagram/reel.mp4")
+        if os.path.exists("video/instagram/reel_1.mp4"):
+            for file in os.listdir(os.path.join("video", "instagram")):
+                os.remove(os.path.join(os.path.join("video", "instagram"), file))
 
+        i = 0
+        
         # Se renombra y se mueve el video, ademas de borrar los demás archivos innecesarios
         for file in os.listdir("download"):
             if file.endswith(".mp4"):
-                os.rename(os.path.join("download", file), "video/instagram/reel.mp4")
+                i += 1
+                os.rename(os.path.join("download", file), f"video/instagram/reel_{i}.mp4")
             else:
                 os.remove(os.path.join("download", file))
         os.rmdir("download")
         
-        await ctx.send(file=discord.File("video/instagram/reel.mp4"))
+        for index in range(0, i):
+            await ctx.send(file=discord.File(f"video/instagram/reel_{index+1}.mp4"))
     @reel.error
     async def reel_error(self, ctx, error):
         print(error)
@@ -193,6 +198,72 @@ class Utility(commands.Cog):
     async def emoji_error(self, ctx, error):
         print(error)
         await ctx.send(embed=discord.Embed(description=f"❌・Ingresa un emoji custom", color=0xdd6879), ephemeral=True)
+
+    # Comando para subir enlace de imagen o gif a Imgur
+    @commands.hybrid_command(name="imgur", description="Comando para subir enlace de imagen o gif a Imgur")
+    @app_commands.describe(enlace = "Enlace de la imagen o gif")
+    async def imgur(self, ctx, enlace : str):
+        await ctx.defer()
+        with open("assets/imgur-clientid.txt") as file:
+            client_id = file.read()
+        headers = {"Authorization": f"Client-ID {client_id}"}
+        data = {"image": enlace}
+
+        response = requests.post("https://api.imgur.com/3/upload", headers=headers, data=data)
+
+        if response.status_code == 200:
+            imgur_link = response.json()['data']['link']
+            embed = discord.Embed(
+                description=f"```{imgur_link}```",
+                color = discord.Color(0x33bebe)
+            )
+            embed.set_image(url=imgur_link)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(embed=discord.Embed(description=f"❌・No se ha podido subir el enlace", color=0xdd6879))
+    @imgur.error
+    async def imgur_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=discord.Embed(description=f"❌・Proporciona un enlace", color=0xdd6879))
+
+    # Comando para descargar y enviar un post de Instagram
+    @commands.hybrid_command(name="instaimg", description="Comando para descargar y enviar imagenes de un enlace de Instagram")
+    @app_commands.describe(enlace = "Enlace del post")
+    async def instaimg(self, ctx, enlace : str):
+        await ctx.defer()
+        
+        # Crear una instancia de Instaloader
+        reel = instaloader.Instaloader()
+        
+        # Extraer el shortcode de la URL
+        shortcode = enlace.split("/")[-2]
+
+        # Descargar el video
+        post = instaloader.Post.from_shortcode(reel.context, shortcode)
+        reel.download_post(post, "download")
+        
+        # Se elimina el anterior video
+        if os.path.exists("img/instagram/img_1.jpg"):
+            for file in os.listdir(os.path.join("img", "instagram")):
+                os.remove(os.path.join(os.path.join("img", "instagram"), file))
+
+        i = 0
+        
+        # Se renombra y se mueve el video, ademas de borrar los demás archivos innecesarios
+        for file in os.listdir("download"):
+            if file.endswith(".jpg"):
+                i += 1
+                os.rename(os.path.join("download", file), f"img/instagram/img_{i}.jpg")
+            else:
+                os.remove(os.path.join("download", file))
+        os.rmdir("download")
+        
+        for index in range(0, i):
+            await ctx.send(file=discord.File(f"img/instagram/img_{index+1}.jpg"))
+    @instaimg.error
+    async def instaimg_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un enlace de Instagram que contenga imagenes", color=0xdd6879), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Utility(bot))
