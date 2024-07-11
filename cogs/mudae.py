@@ -582,13 +582,15 @@ class Mudae(commands.Cog):
                                     enlaceMayor = message.jump_url
                                     creadoMayor = message.created_at
                                     imgPj = lastEmbed["image"]["url"]
-        
+                                    msg = message
+
         actual = datetime.now(creadoMayor.tzinfo)
         diferencia = (actual - creadoMayor).seconds
         if diferencia > 90:
             diferencia = 90
         
         if not enlaceMayor == "":
+            await msg.add_reaction(":kakera:1260465357085474968")
             embed = discord.Embed(title=f"{mayor} <:kakera:1260465357085474968>", color=0x879bf5)
             embed.add_field(name=f"💬 Enlace al mensaje", value=enlaceMayor, inline=False)
             embed.set_footer(text=f"Tiempo restante: {90 - diferencia} segundos", icon_url="https://i.imgur.com/fEH1X8C.png")
@@ -598,6 +600,7 @@ class Mudae(commands.Cog):
             await ctx.send(embed=discord.Embed(description=f"❌・No se encontró un tiro tuyo reclamable de Mudae (comandos slash)", color=0xdd6879), ephemeral=True)
     @kakera.error
     async def kakera_error(self, ctx, error):
+        print(error)
         await ctx.send(embed=discord.Embed(description=f"❌・No se encontró un tiro tuyo reclamable de Mudae (comandos slash)", color=0xdd6879), ephemeral=True)
 
 async def setup(bot):
