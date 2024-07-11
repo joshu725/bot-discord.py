@@ -5,7 +5,8 @@ from discord import app_commands
 import requests
 from colorthief import ColorThief
 from PIL import Image, ImageSequence
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+import re
 
 # Clase principal
 class Mudae(commands.Cog):
@@ -557,6 +558,47 @@ class Mudae(commands.Cog):
         embed.timestamp = time
         embed.set_footer(text="Fecha", icon_url="https://i.imgur.com/fEH1X8C.png")
         await ctx.send(embed=embed)
+
+    # Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes en Mudae
+    @commands.hybrid_command(name="kakera", description="Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes", aliases=['k'])
+    async def kakera(self, ctx):
+        mayor = 0
+        enlaceMayor = ""
+        async for message in ctx.channel.history(limit=100):
+            if message.author.id == 432610292342587392:
+                if message.interaction:
+                    if message.interaction.user.id == ctx.author.id:
+                        if not message.components:
+                            if (datetime.now(message.created_at.tzinfo) - message.created_at).seconds < 90:
+                                for embed in message.embeds:
+                                    lastEmbed = embed.to_dict()
+
+                                pattern = r"\*\*(\d+)\*\*<:kakera:469835869059153940>"
+                                match = re.search(pattern, lastEmbed["description"])
+                                number = int(match.group(1))
+                                
+                                if (number > mayor):
+                                    mayor = number
+                                    enlaceMayor = message.jump_url
+                                    creadoMayor = message.created_at
+                                    imgPj = lastEmbed["image"]["url"]
+        
+        actual = datetime.now(creadoMayor.tzinfo)
+        diferencia = (actual - creadoMayor).seconds
+        if diferencia > 90:
+            diferencia = 90
+        
+        if not enlaceMayor == "":
+            embed = discord.Embed(title=f"{mayor} <:kakera:1260465357085474968>", color=0x879bf5)
+            embed.add_field(name=f"💬 Enlace al mensaje", value=enlaceMayor, inline=False)
+            embed.set_footer(text=f"Tiempo restante: {90 - diferencia} segundos", icon_url="https://i.imgur.com/fEH1X8C.png")
+            embed.set_thumbnail(url=imgPj)
+            await ctx.send(embed=embed)
+        else:
+            await ctx.send(embed=discord.Embed(description=f"❌・No se encontró un tiro tuyo reclamable de Mudae (comandos slash)", color=0xdd6879), ephemeral=True)
+    @kakera.error
+    async def kakera_error(self, ctx, error):
+        await ctx.send(embed=discord.Embed(description=f"❌・No se encontró un tiro tuyo reclamable de Mudae (comandos slash)", color=0xdd6879), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Mudae(bot))

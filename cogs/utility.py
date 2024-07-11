@@ -184,8 +184,10 @@ class Utility(commands.Cog):
             await ctx.send(file=discord.File(f"video/instagram/reel_{index+1}.mp4"))
     @reel.error
     async def reel_error(self, ctx, error):
-        print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un enlace de un video de Instagram", color=0xdd6879), ephemeral=True)
+        if str(error) == "Hybrid command raised an error: Command 'reel' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
+            await ctx.send(embed=discord.Embed(description=f"❌・El vídeo pesa más de 25mb", color=0xdd6879), ephemeral=True)
+        else:
+            await ctx.send(embed=discord.Embed(description=f"❌・Inserta un enlace de un video de Instagram", color=0xdd6879), ephemeral=True)
 
     # Comando para visualizar en grande un emoji custom
     @commands.hybrid_command(name="emoji", description="Comando para visualizar en grande un emoji custom", aliases=["e"])
