@@ -5,7 +5,7 @@ from discord import app_commands
 import requests
 from colorthief import ColorThief
 from PIL import Image, ImageSequence
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 import re
 
 # Clase principal
@@ -570,21 +570,22 @@ class Mudae(commands.Cog):
                     if message.interaction.user.id == ctx.author.id:
                         if not message.components:
                             if (datetime.now(message.created_at.tzinfo) - message.created_at).seconds < 90:
-                                for embed in message.embeds:
-                                    lastEmbed = embed.to_dict()
+                                if message.embeds:
+                                    for embed in message.embeds:
+                                        lastEmbed = embed.to_dict()
 
-                                if "footer" not in lastEmbed or "icon_url" not in lastEmbed["footer"]:
-                                    pattern = r"\*\*(\d+)\*\*<:kakera:469835869059153940>"
-                                    match = re.search(pattern, lastEmbed["description"])
-                                    number = int(match.group(1))
-                                    
-                                    if (number > mayor):
-                                        mayor = number
-                                        enlaceMayor = message.jump_url
-                                        creadoMayor = message.created_at
-                                        msg = message
-                                        imgPj = lastEmbed["image"]["url"]
-                                        nombrePj = lastEmbed['author']['name']
+                                    if "footer" not in lastEmbed or "icon_url" not in lastEmbed["footer"]:
+                                        pattern = r"\*\*(\d+)\*\*<:kakera:469835869059153940>"
+                                        match = re.search(pattern, lastEmbed["description"])
+                                        number = int(match.group(1))
+                                        
+                                        if (number > mayor):
+                                            mayor = number
+                                            enlaceMayor = message.jump_url
+                                            creadoMayor = message.created_at
+                                            msg = message
+                                            imgPj = lastEmbed["image"]["url"]
+                                            nombrePj = lastEmbed['author']['name']
         
         if not enlaceMayor == "":
             actual = datetime.now(creadoMayor.tzinfo)
