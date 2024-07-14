@@ -16,10 +16,11 @@ class Settings(commands.Cog):
     # Muestra el avatar tuyo o de la persona que menciones
     @commands.hybrid_command(name="help", description="Acerca de Choppa")
     async def help(self, ctx):
-        embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xae7163)
+        embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xffa3a3)
 
         embed.add_field(name=f"🔧 Utilidad", value="`avatar`, `say`, `emoji`, `fxtwitter`, `reemplazar`, `youtube`, `tiktok`, `reel`, `instaimg`, `imgur`", inline=False)
         embed.add_field(name=f"🎨 Entretenimiento", value="`apuntar`, `quieres`, `logro`, `love`", inline=False)
+        embed.add_field(name=f"🛠️ Moderación", value="`prune`", inline=False)
         embed.add_field(name=f"<:kakera:1260465357085474968> Mudae", value="`embedcolor`, `cortarimagen`, `cortargif`, `tiemporestante`, `kakera`", inline=False)
 
         embed.set_image(url="https://i.imgur.com/SOZfVMH.jpeg")

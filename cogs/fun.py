@@ -75,35 +75,35 @@ class Fun(commands.Cog):
             porcentaje= f"💖 `████████████████████` 💖  **{p}%**"
 
         if len(member) == 0:
-            await ctx.send(embed=discord.Embed(description=f"**Menciona a dos usuarios para ver su porcentaje de amor**\n\n`c!love @usuario1 @usuario2`", color=0xdd6879))
+            await ctx.send(embed=discord.Embed(description=f"**Menciona a dos usuarios para ver su porcentaje de amor**\n\n`c!love @usuario1 @usuario2`", color=0xaaffaa))
         if len(member) == 1:
-            embed = discord.Embed(title=f"{ctx.author.display_name} & {member[0].display_name}", description=porcentaje, color=0xdd6879)
+            embed = discord.Embed(title=f"{ctx.author.display_name} & {member[0].display_name}", description=porcentaje, color=0xaaffaa)
             embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
             await ctx.send(embed=embed)
         if len(member) == 2:
             if member[0].id == 235197855529304064:
                 if member[1].id == 263880901094539266:
-                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description="💖 `████████████████████` 💖  **100%**", color=0xdd6879)
+                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description="💖 `████████████████████` 💖  **100%**", color=0xaaffaa)
                     embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
                     await ctx.send(embed=embed)
             elif member[0].id == 263880901094539266:
                 if member[1].id == 235197855529304064:
-                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description="💖 `████████████████████` 💖  **100%**", color=0xdd6879)
+                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description="💖 `████████████████████` 💖  **100%**", color=0xaaffaa)
                     embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
                     await ctx.send(embed=embed)
             else:
-                embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description=porcentaje, color=0xdd6879)
+                embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description=porcentaje, color=0xaaffaa)
                 embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
                 await ctx.send(embed=embed)
         if len(member) > 2:
-            await ctx.send(embed=discord.Embed(description=f"**Menciona a dos usuarios para ver su porcentaje de amor**\n\n`c!love @usuario1 @usuario2`", color=0xdd6879))
+            await ctx.send(embed=discord.Embed(description=f"**Menciona a dos usuarios para ver su porcentaje de amor**\n\n`c!love @usuario1 @usuario2`", color=0xaaffaa))
 
     # Comando para mandar una imagen del logro de Minecraft con los carácteres que indiquemos
     @commands.hybrid_command(name="logro", description="Comando para mandar una imagen del logro de Minecraft con el texto que indiquemos")
     @app_commands.describe(texto = "Texto a indicar (21 carácteres máximo)")
     async def logro(self, ctx, texto : str = None):
         if texto == None:
-            await ctx.send(embed=discord.Embed(description=f"**Crea tu propio logro al estilo Minecraft** \n\n`c!logro \"texto\"` (21 carácteres máximo)", color=0xdd6879))
+            await ctx.send(embed=discord.Embed(description=f"**Crea tu propio logro al estilo Minecraft** \n\n`c!logro \"texto\"` (21 carácteres máximo)", color=0xaaffaa))
             return
 
         if len(texto) < 22:
@@ -121,7 +121,7 @@ class Fun(commands.Cog):
 
             await ctx.send(file=discord.File("assets/logro_minecraft/minecraft_logro.png"))
         else:
-            await ctx.send(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xdd6879), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xaaffaa), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Fun(bot))
