@@ -56,7 +56,6 @@ class Moderation(commands.Cog):
         await ctx.send(embed=embed)
     @kick.error
     async def kick_error(self, ctx, error):
-        print(error)
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:
@@ -76,7 +75,6 @@ class Moderation(commands.Cog):
         await ctx.send(embed=embed)
     @ban.error
     async def ban_error(self, ctx, error):
-        print(error)
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:

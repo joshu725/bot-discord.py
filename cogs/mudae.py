@@ -8,6 +8,8 @@ from PIL import Image, ImageSequence
 from datetime import datetime, timedelta
 import re
 
+COLOR = 0x9dd6ff
+
 # Clase principal
 class Mudae(commands.Cog):
     def __init__(self, bot):
@@ -39,7 +41,7 @@ class Mudae(commands.Cog):
         if now_time > time:
             channel = await self.bot.fetch_channel(1247267606415806496)
             
-            embed = discord.Embed(title="Kakera :)", description=f"El siguiente comando está disponible\n```$bitesthedust requiem```", colour=0x9dd6ff)
+            embed = discord.Embed(title="Kakera :)", description=f"El siguiente comando está disponible\n```$bitesthedust requiem```", colour=COLOR)
             embed.set_thumbnail(url="https://i.imgur.com/FDBj4Oe.gif")
             embed.set_image(url="https://imgur.com/Fiptqgp.gif")
 
@@ -135,14 +137,14 @@ class Mudae(commands.Cog):
                             if interaction.user.id == self.idAutor:
                                 await interaction.message.delete()
                             else:
-                                await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                                await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                             
                     await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, ctx.author.id))
                     return
     @embedcolor.error
     async def embedcolor_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・No se ha encontrado un mensaje `embed` de Mudae", color=0x9dd6ff))
+        await ctx.send(embed=discord.Embed(description=f"❌ No se ha encontrado un mensaje `embed` de **Mudae**", color=COLOR))
 
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
     @commands.hybrid_command(name="cortarimagen", description="Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae", aliases=['ci'])
@@ -178,9 +180,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
@@ -203,9 +205,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         class cropButtonsH(discord.ui.View):
             def __init__(self, img_original : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
@@ -237,9 +239,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='🔽', style=discord.ButtonStyle.grey)
@@ -262,15 +264,15 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         if enlace == None:
             if ctx.message.attachments:
                 enlace = ctx.message.attachments[0].url
             else:
-                await ctx.send(embed=discord.Embed(description=f"❌・Inserta una imagen o un enlace", color=0x9dd6ff))
+                await ctx.send(embed=discord.Embed(description=f"❌ Inserta una imagen o un enlace", color=COLOR))
                 return
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
@@ -331,7 +333,7 @@ class Mudae(commands.Cog):
     @cortarimagen.error
     async def cortarimagen_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・Inserta una imagen o un enlace", color=0x9dd6ff))
+        await ctx.send(embed=discord.Embed(description=f"❌ Inserta una imagen o un enlace", color=COLOR))
 
     # Comando para cortar imagenes conservando la relación de aspecto de las imagenes del bot Mudae
     @commands.hybrid_command(name="cortargif", description="Comando para cortar gifs conservando la relación de aspecto de las imagenes del bot Mudae", aliases=['cg'])
@@ -369,9 +371,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
@@ -394,9 +396,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         class cropButtonsH(discord.ui.View):
             def __init__(self, img_original : Image, marco : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
@@ -429,9 +431,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='🔽', style=discord.ButtonStyle.grey)
@@ -454,15 +456,15 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=0x9dd6ff), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=0x9dd6ff), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         if enlace == None:
             if ctx.message.attachments:
                 enlace = ctx.message.attachments[0].url
             else:
-                await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0x9dd6ff))
+                await ctx.send(embed=discord.Embed(description=f"❌ Inserta un gif o un enlace", color=COLOR))
                 return
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
@@ -533,7 +535,7 @@ class Mudae(commands.Cog):
     @cortargif.error
     async def cortargif_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un gif o un enlace", color=0x9dd6ff))
+        await ctx.send(embed=discord.Embed(description=f"❌ Inserta un gif o un enlace", color=COLOR))
 
     # Comando para ver el tiempo exacto que falta para el $bitesthedust requiem
     @commands.hybrid_command(name="tiemporestante", description="Comando para ver el tiempo exacto que falta para el $bitesthedust requiem", aliases=['tr'])
@@ -553,7 +555,7 @@ class Mudae(commands.Cog):
         
         mudae = await self.bot.fetch_user(432610292342587392)
         
-        embed = discord.Embed(title="Tiempo restante", description=f"Faltan {dias} días, {horas} horas, y {minutos} minutos para el `$bitesthedust requiem`", colour=0x9dd6ff)
+        embed = discord.Embed(title="Tiempo restante", description=f"Faltan {dias} días, {horas} horas, y {minutos} minutos para el `$bitesthedust requiem`", colour=COLOR)
         embed.set_thumbnail(url=mudae.avatar)
         embed.timestamp = time
         embed.set_footer(text="Fecha", icon_url="https://i.imgur.com/fEH1X8C.png")
@@ -591,17 +593,17 @@ class Mudae(commands.Cog):
             actual = datetime.now(creadoMayor.tzinfo)
             await msg.add_reaction(":kakera:1260465357085474968")
             
-            embed = discord.Embed(title=f"{nombrePj}・{mayor} <:kakera:1260465357085474968>", color=0x9dd6ff)
+            embed = discord.Embed(title=f"{nombrePj}・{mayor} <:kakera:1260465357085474968>", color=COLOR)
             embed.add_field(name=f"💬 Enlace al mensaje", value=enlaceMayor, inline=False)
             embed.set_footer(text=f"Tiempo restante: {90 - (actual - creadoMayor).seconds} segundos", icon_url="https://i.imgur.com/fEH1X8C.png")
             embed.set_thumbnail(url=imgPj)
             await ctx.send(embed=embed)
         else:
-            await ctx.send(embed=discord.Embed(description=f"❌・No se encontró un tiro tuyo reclamable (comandos slash)", color=0x9dd6ff), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ No se encontró un tiro tuyo reclamable (comandos slash)", color=COLOR), ephemeral=True)
     @kakera.error
     async def kakera_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・No se encontró un tiro tuyo reclamable (comandos slash)", color=0x9dd6ff), ephemeral=True)
+        await ctx.send(embed=discord.Embed(description=f"❌ No se encontró un tiro tuyo reclamable (comandos slash)", color=COLOR), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Mudae(bot))

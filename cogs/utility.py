@@ -10,6 +10,8 @@ import pyktok as pyk
 import instaloader
 import os
 
+COLOR = 0xb2b2ff
+
 # Clase principal
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -99,9 +101,13 @@ class Utility(commands.Cog):
             await ctx.send(f"{transformed_url}")
         else:
             if resultado == "El enlace no pertenece a 'x.com'":
-                await ctx.send(embed=discord.Embed(description=f"❌・El enlace no pertenece a Twitter", color=0xb2b2ff), ephemeral=True)
+                await ctx.send(embed=discord.Embed(description=f"❌ El enlace no pertenece a Twitter", color=COLOR), ephemeral=True)
             else:
-                await ctx.send(embed=discord.Embed(description=f"❌・Enlace inválido", color=0xb2b2ff), ephemeral=True)
+                await ctx.send(embed=discord.Embed(description=f"❌ Enlace inválido", color=COLOR), ephemeral=True)
+    @fxtwitter.error
+    async def fxtwitter_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=createEmbedInfo("fxtwitter", "Envía el enlace de **Twitter** de manera que los videos e imagenes puedan visualizarse **correctamente**", "!fxtwitter 'https://x.com/ejemplo/status/1234567890'", ctx.author.avatar))
 
     # Comando para reemplazar el texto indicado
     @commands.hybrid_command(name="reemplazar", description="Comando para reemplazar el texto indicado")
@@ -110,7 +116,8 @@ class Utility(commands.Cog):
         await ctx.send(texto.replace(textoareemplazar, reemplazo))
     @reemplazar.error
     async def reemplazar_error(self, ctx, error):
-        await ctx.send(embed=discord.Embed(description=f"❌・`/reemplazar`", color=0xb2b2ff), ephemeral=True)
+        print(error)
+        await ctx.send(embed=createEmbedInfo("reemplazar", "**Reemplaza** el texto indicado", "/reemplazar 'texto_original' 'texto_a_reemplazar' 'reemplazo'", ctx.author.avatar))
 
     # Comando para descargar y enviar un video de Youtube
     @commands.hybrid_command(name="youtube", description="Comando para descargar y enviar un video de Youtube")
@@ -119,8 +126,7 @@ class Utility(commands.Cog):
         try: 
             yt = YouTube(enlace) 
         except:
-            await ctx.send(embed=discord.Embed(description=f"❌・No se ha encontrado el video", color=0xb2b2ff), ephemeral=True)
-            return
+            return await ctx.send(embed=discord.Embed(description=f"❌ No se ha encontrado el video", color=COLOR), ephemeral=True)
         
         await ctx.defer()
         
@@ -131,10 +137,14 @@ class Utility(commands.Cog):
             video.download(output_path="video", filename="youtube.mp4")
             await ctx.send(file=discord.File("video/youtube.mp4"))
         except: 
-            await ctx.send(embed=discord.Embed(description=f"❌・Error al descargar el video", color=0xb2b2ff))
+            await ctx.send(embed=discord.Embed(description=f"❌ Error al descargar el video", color=COLOR))
     @youtube.error
     async def youtube_error(self, ctx, error):
-        await ctx.send(embed=discord.Embed(description=f"❌・No se ha encontrado el video", color=0xb2b2ff), ephemeral=True)
+        print(error)
+        if str(error) == "Hybrid command raised an error: Command 'youtube' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
+            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
+        else:
+            await ctx.send(embed=createEmbedInfo("youtube", "Descarga y envía un video o short de **YouTube**", "!youtube 'url'", ctx.author.avatar))
 
     # Comando para descargar y enviar un video de TikTok
     @commands.hybrid_command(name="tiktok", description="Comando para descargar y enviar un video de TikTok")
@@ -142,14 +152,21 @@ class Utility(commands.Cog):
     async def tiktok(self, ctx, enlace : str):
         await ctx.defer()
         pyk.specify_browser('brave')
-        pyk.save_tiktok(enlace, True) # Para guardar el archivo con un nombre especifico tuve que modificar la librería pyktok
-        await ctx.send(file=discord.File("video/tiktok.mp4"))
+        try:
+            pyk.save_tiktok(enlace, True)
+            await ctx.send(file=discord.File("video/tiktok.mp4"))
+        except:
+            await ctx.send(embed=discord.Embed(description=f"❌ Error al descargar el video", color=COLOR), ephemeral=True)
     @tiktok.error
     async def tiktok_error(self, ctx, error):
-        await ctx.send(embed=discord.Embed(description=f"❌・Error al descargar el video", color=0xb2b2ff), ephemeral=True)
+        print(error)
+        if str(error) == "Hybrid command raised an error: Command 'tiktok' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
+            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
+        else:
+            await ctx.send(embed=createEmbedInfo("tiktok", "Descarga y envía un video de **TikTok**", "!tiktok 'url'", ctx.author.avatar))
 
     # Comando para descargar y enviar un reel de Instagram
-    @commands.hybrid_command(name="reel", description="Comando para descargar y enviar un reel de Instagram")
+    @commands.hybrid_command(name="reel", description="Comando para descargar y enviar uno o varios videos de Instagram")
     @app_commands.describe(enlace = "Enlace del reel")
     async def reel(self, ctx, enlace : str):
         await ctx.defer()
@@ -184,22 +201,23 @@ class Utility(commands.Cog):
             await ctx.send(file=discord.File(f"video/instagram/reel_{index+1}.mp4"))
     @reel.error
     async def reel_error(self, ctx, error):
+        print(error)
         if str(error) == "Hybrid command raised an error: Command 'reel' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌・El vídeo pesa más de 25mb", color=0xb2b2ff), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
         else:
-            await ctx.send(embed=discord.Embed(description=f"❌・Inserta un enlace de un video de Instagram", color=0xb2b2ff), ephemeral=True)
+            await ctx.send(embed=createEmbedInfo("reel", "Descarga y envía uno o varios videos de **Instagram**", "!reel 'url'", ctx.author.avatar))
 
     # Comando para visualizar en grande un emoji custom
     @commands.hybrid_command(name="emoji", description="Comando para visualizar en grande un emoji custom", aliases=["e"])
     @app_commands.describe(emoji = "Emoji custom")
     async def emoji(self, ctx, emoji : discord.Emoji):
-        embed=discord.Embed(title=f":{emoji.name}:", description=f"[URL]({emoji.url})", color = discord.Color(0xb2b2ff))
+        embed=discord.Embed(title=f":{emoji.name}:", description=f"[URL]({emoji.url})", color = discord.Color(COLOR))
         embed.set_image(url=f"{emoji.url}")
         await ctx.send(embed=embed)
     @emoji.error
     async def emoji_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・Ingresa un emoji custom", color=0xb2b2ff), ephemeral=True)
+        await ctx.send(embed=createEmbedInfo("emoji", "Visualiza en grande un **emoji custom**", "!emoji ':emoji_custom:'", ctx.author.avatar))
 
     # Comando para subir enlace de imagen o gif a Imgur
     @commands.hybrid_command(name="imgur", description="Comando para subir enlace de imagen o gif a Imgur")
@@ -217,16 +235,16 @@ class Utility(commands.Cog):
             imgur_link = response.json()['data']['link']
             embed = discord.Embed(
                 description=f"```{imgur_link}```",
-                color = discord.Color(0xb2b2ff)
+                color = discord.Color(COLOR)
             )
             embed.set_image(url=imgur_link)
             await ctx.send(embed=embed)
         else:
-            await ctx.send(embed=discord.Embed(description=f"❌・No se ha podido subir el enlace", color=0xb2b2ff))
+            await ctx.send(embed=discord.Embed(description=f"❌ No se ha podido subir el enlace", color=COLOR))
     @imgur.error
     async def imgur_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・Proporciona un enlace", color=0xb2b2ff))
+        await ctx.send(embed=createEmbedInfo("imgur", "Sube un enlace de imagen o gif a **Imgur**", "!imgur 'url'", ctx.author.avatar))
 
     # Comando para descargar y enviar un post de Instagram
     @commands.hybrid_command(name="instaimg", description="Comando para descargar y enviar imagenes de un enlace de Instagram")
@@ -265,7 +283,13 @@ class Utility(commands.Cog):
     @instaimg.error
     async def instaimg_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌・Inserta un enlace de Instagram que contenga imagenes", color=0xb2b2ff), ephemeral=True)
+        await ctx.send(embed=createEmbedInfo("instaimg", "Descarga y envia imagenes de un enlace en **Instagram**", "!instaimg 'url'", ctx.author.avatar))
 
 async def setup(bot):
     await bot.add_cog(Utility(bot))
+
+def createEmbedInfo(comando : str, especificacion : str, formato : str, urlIcono : str):
+    embed = discord.Embed(description = especificacion, color = COLOR)
+    embed.set_author(name = comando, icon_url = urlIcono)
+    embed.add_field(name = "🗒️ Formato", value=f"`{formato}`", inline=False)
+    return embed

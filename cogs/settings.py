@@ -20,7 +20,7 @@ class Settings(commands.Cog):
 
         embed.add_field(name=f"🔧 Utilidad", value="`avatar`, `say`, `emoji`, `fxtwitter`, `reemplazar`, `youtube`, `tiktok`, `reel`, `instaimg`, `imgur`", inline=False)
         embed.add_field(name=f"🎨 Entretenimiento", value="`apuntar`, `quieres`, `logro`, `love`", inline=False)
-        embed.add_field(name=f"🛠️ Moderación", value="`prune`, `kick`, `ban`, `mute`, `unmute`,", inline=False)
+        embed.add_field(name=f"🛠️ Moderación", value="`prune`, `kick`, `ban`, `mute`, `unmute`", inline=False)
         embed.add_field(name=f"<:kakera:1260465357085474968> Mudae", value="`embedcolor`, `cortarimagen`, `cortargif`, `tiemporestante`, `kakera`", inline=False)
 
         embed.set_image(url="https://i.imgur.com/SOZfVMH.jpeg")
@@ -40,18 +40,6 @@ class Settings(commands.Cog):
                 await ctx.message.add_reaction('✅')
     @reload.error
     async def reload_error(self, ctx, error):
-        print(error)
-        await ctx.message.add_reaction('❌')
-        
-    # Comando para recargar los slash
-    @commands.command(aliases=['rs'])
-    @commands.has_permissions(administrator=True)
-    async def reloadslash(self, ctx):
-        synced = await self.bot.tree.sync()
-        print(f"\nComandos slash sincronizados: {len(synced)}\n")
-        await ctx.message.add_reaction('✅')
-    @reloadslash.error
-    async def reloadslash_error(self, ctx, error):
         print(error)
         await ctx.message.add_reaction('❌')
 

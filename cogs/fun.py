@@ -6,6 +6,8 @@ import requests
 import random
 from PIL import Image, ImageDraw, ImageFont
 
+COLOR = 0xaaffaa
+
 # Clase principal
 class Fun(commands.Cog):
     def __init__(self, bot):
@@ -31,7 +33,10 @@ class Fun(commands.Cog):
         avatar.paste(pistola, (300, 300), pistola)
         avatar.save("img/avatar.png")
         await ctx.send(file=discord.File("img/avatar.png"))
-    
+    @apuntar.error
+    async def apuntar_error(self, ctx, error):
+        print(error)
+
     # Comando meme "quieres?"
     @commands.hybrid_command(name="quieres", description="Comando meme \"quieres\" que utiliza el avatar del usuario")
     @app_commands.describe(member = "Usuario con el que deseas aplicar este comando")
@@ -48,6 +53,9 @@ class Fun(commands.Cog):
         avatar.paste(quieres, (0, 0), quieres)
         avatar.save("img/avatar.png")
         await ctx.send(file=discord.File("img/avatar.png"))
+    @quieres.error
+    async def quieres_error(self, ctx, error):
+        print(error)
 
     # Comando para determinar aleatoriamente la compatibilidad entre personas
     @commands.command()
@@ -75,36 +83,38 @@ class Fun(commands.Cog):
             porcentaje= f"💖 `████████████████████` 💖  **{p}%**"
 
         if len(member) == 0:
-            await ctx.send(embed=discord.Embed(description=f"**Menciona a dos usuarios para ver su porcentaje de amor**\n\n`c!love @usuario1 @usuario2`", color=0xaaffaa))
+            await ctx.send(embed=createEmbedInfo("love", "Menciona a **dos usuarios** para ver su porcentaje de amor", "!love '@usuario1' '@usuario2'", ctx.author.avatar))
         if len(member) == 1:
-            embed = discord.Embed(title=f"{ctx.author.display_name} & {member[0].display_name}", description=porcentaje, color=0xaaffaa)
+            embed = discord.Embed(title=f"{ctx.author.display_name} & {member[0].display_name}", description=f"‎ \n{porcentaje}", color=COLOR)
             embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
             await ctx.send(embed=embed)
         if len(member) == 2:
             if member[0].id == 235197855529304064:
                 if member[1].id == 263880901094539266:
-                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description="💖 `████████████████████` 💖  **100%**", color=0xaaffaa)
+                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}", description="‎ \n💖 `████████████████████` 💖  **100%**", color=COLOR)
                     embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
                     await ctx.send(embed=embed)
             elif member[0].id == 263880901094539266:
                 if member[1].id == 235197855529304064:
-                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description="💖 `████████████████████` 💖  **100%**", color=0xaaffaa)
+                    embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}", description="‎ \n💖 `████████████████████` 💖  **100%**", color=COLOR)
                     embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
                     await ctx.send(embed=embed)
             else:
-                embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}",description=porcentaje, color=0xaaffaa)
+                embed=discord.Embed(title=f"{member[0].display_name} & {member[1].display_name}", description=f"‎ \n{porcentaje}", color=COLOR)
                 embed.set_thumbnail(url="https://i.imgur.com/sCFJA7V.gif")
                 await ctx.send(embed=embed)
         if len(member) > 2:
-            await ctx.send(embed=discord.Embed(description=f"**Menciona a dos usuarios para ver su porcentaje de amor**\n\n`c!love @usuario1 @usuario2`", color=0xaaffaa))
+            await ctx.send(embed=createEmbedInfo("love", "Menciona a **dos usuarios** para ver su porcentaje de amor", "!love '@usuario1' '@usuario2'", ctx.author.avatar))
+    @love.error
+    async def love_error(self, ctx, error):
+        print(error)
 
     # Comando para mandar una imagen del logro de Minecraft con los carácteres que indiquemos
     @commands.hybrid_command(name="logro", description="Comando para mandar una imagen del logro de Minecraft con el texto que indiquemos")
     @app_commands.describe(texto = "Texto a indicar (21 carácteres máximo)")
-    async def logro(self, ctx, texto : str = None):
+    async def logro(self, ctx, *, texto : str = None):
         if texto == None:
-            await ctx.send(embed=discord.Embed(description=f"**Crea tu propio logro al estilo Minecraft** \n\n`c!logro \"texto\"` (21 carácteres máximo)", color=0xaaffaa))
-            return
+            return await ctx.send(embed=createEmbedInfo("logro", "Crea tu propio **logro** al estilo **Minecraft**", "!logro 'texto' (21 carácteres máximo)", ctx.author.avatar))
 
         if len(texto) < 22:
             items = ["apple", "arrow", "bed", "book", "bottled", "bucket", "cake", "charcoal", "chest", "chestplate", "diamond", "furnace", "gold", "grass", "musicdisk", "pickaxe", "sword", "table", "wood", "woodenplank"]
@@ -121,7 +131,10 @@ class Fun(commands.Cog):
 
             await ctx.send(file=discord.File("assets/logro_minecraft/minecraft_logro.png"))
         else:
-            await ctx.send(embed=discord.Embed(description=f"❌・21 carácteres máximo", color=0xaaffaa), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ 21 carácteres máximo", color=COLOR), ephemeral=True)
+    @logro.error
+    async def logro_error(self, ctx, error):
+        print(error)
 
 async def setup(bot):
     await bot.add_cog(Fun(bot))
@@ -132,3 +145,9 @@ async def descargar_avatar(avatar):
         img_data = r.content
     with open('img/avatar.png', 'wb') as handler:
         handler.write(img_data)
+
+def createEmbedInfo(comando : str, especificacion : str, formato : str, urlIcono : str):
+    embed = discord.Embed(description = especificacion, color = COLOR)
+    embed.set_author(name = comando, icon_url = urlIcono)
+    embed.add_field(name = "🗒️ Formato", value=f"`{formato}`", inline=False)
+    return embed
