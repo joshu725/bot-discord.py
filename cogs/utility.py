@@ -118,14 +118,14 @@ class Utility(commands.Cog):
     async def youtube(self, ctx, enlace : str):
         try: 
             yt = YouTube(enlace) 
-        except: 
+        except:
             await ctx.send(embed=discord.Embed(description=f"❌・No se ha encontrado el video", color=0xb2b2ff), ephemeral=True)
             return
         
         await ctx.defer()
         
         # Obtener la mejor calidad disponible
-        video = yt.streams.filter(progressive=True, file_extension='mp4').first()
+        video = yt.streams.get_highest_resolution()
 
         try: 
             video.download(output_path="video", filename="youtube.mp4")
