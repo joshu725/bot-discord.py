@@ -46,11 +46,12 @@ class Settings(commands.Cog):
     # Comando para para ver la información de un mensaje con su ID
     @commands.command(aliases=['m'])
     @commands.has_permissions(administrator=True)
-    async def message(self, ctx, channelID : int, msgID : int):
+    async def message(self, ctx, channel_id : int, message_id : int):
         await ctx.message.delete()
-        channel = self.bot.get_channel(channelID)
-        msg = await self.bot.get_message(channel, msgID)
-        print(msg)
+        channel = self.bot.get_channel(channel_id)
+        message = await channel.fetch_message(message_id)
+        print(message)
+        print(message.created_at)
 
 async def setup(bot):
     await bot.add_cog(Settings(bot))

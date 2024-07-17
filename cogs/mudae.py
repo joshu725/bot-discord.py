@@ -7,6 +7,8 @@ from colorthief import ColorThief
 from PIL import Image, ImageSequence
 from datetime import datetime, timedelta
 import re
+import json
+import os
 
 COLOR = 0x9dd6ff
 
@@ -23,34 +25,58 @@ class Mudae(commands.Cog):
     # Registra el momento en el que se hace correctamente un $bitesthedust requiem
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.id == 432610292342587392 and message.content == "Otro más que muerde el polvo...\nhttps://imgur.com/Fiptqgp.gif" and message.channel.id == 1247267606415806496:
-            f = open("assets/datetime.txt", "w")
-            f.write(str(message.created_at))
-            f.close()
+        if message.author.id == 432610292342587392 and (message.content == "Otro más que muerde el polvo...\nhttps://imgur.com/Fiptqgp.gif" or message.content == "Another one bites the dust...\nhttps://imgur.com/Fiptqgp.gif"):
+            data = {}
+            if os.path.isfile('assets\\bitesthedust.json'):
+                with open('assets\\bitesthedust.json', 'r') as file:
+                    try:
+                        data = json.load(file)
+                    except json.JSONDecodeError:
+                        data = {}
 
-    # Cada 3 minutos se comprueba que la fecha actual sea mayor a la fecha indicada en 'datetime.txt' + 15 dias
-    @tasks.loop(minutes=3.0)
-    async def comprobarTiempo(self):
-        f = open("assets/datetime.txt", "r")
-        time = datetime.strptime(f.read(26), '%Y-%m-%d %H:%M:%S.%f')
-        f.close()
-        
-        time += timedelta(days=15)
-        now_time = datetime.now(time.tzinfo)
-        
-        if now_time > time:
-            channel = await self.bot.fetch_channel(1247267606415806496)
+            elementoNuevo = {
+                "guild_name": message.guild.name,
+                "channel_name": message.channel.name,
+                "channel_id": message.channel.id,
+                "message_id": message.id,
+                "created_at": str(message.created_at),
+                "notified": False
+            }
             
-            embed = discord.Embed(title="¡Kakera!", description=f"El siguiente comando está disponible:\n```$bitesthedust requiem```", color=COLOR)
-            embed.set_thumbnail(url="https://i.imgur.com/FDBj4Oe.gif")
-            embed.set_image(url="https://imgur.com/Fiptqgp.gif")
-            embed.set_footer(text="No olvides realizar el comando $mmn+s para guardar las notas", icon_url="https://i.imgur.com/h4z8Of1.png")
+            data[str(message.guild.id)] = elementoNuevo
+            
+            with open('assets\\bitesthedust.json', 'w') as file:
+                json.dump(data, file, indent = 4)
 
-            await channel.send("<@263880901094539266> <@235197855529304064>", embed=embed)
-            self.comprobarTiempo.stop()
-    @comprobarTiempo.error
-    async def comprobarTiempo_error(self, ctx, error):
-        print(error)
+    # Cada minuto se comprueba que la fecha actual sea mayor a la fecha indicada y que se haya mandado la notificación de cada servidor en el archivo bitesthedust.json
+    @tasks.loop(minutes=1.0)
+    async def comprobarTiempo(self):
+        with open('assets\\bitesthedust.json', 'r') as file:
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError:
+                return
+        
+        for key, value in data.items():
+            created_at = value['created_at']
+            time = datetime.strptime(created_at, '%Y-%m-%d %H:%M:%S.%f%z')
+            time += timedelta(days=15)
+            now_time = datetime.now(time.tzinfo)
+            
+            if now_time > time and value['notified'] == False:
+                channel = await self.bot.fetch_channel(value['channel_id'])
+                guild = await self.bot.fetch_guild(int(key))
+                owner = await guild.fetch_member(guild.owner_id)
+                
+                embed = discord.Embed(title="¡Kakera!", description=f"El siguiente comando está disponible:\n```$bitesthedust requiem```", color=COLOR)
+                embed.set_thumbnail(url="https://i.imgur.com/FDBj4Oe.gif")
+                embed.set_image(url="https://imgur.com/Fiptqgp.gif")
+                embed.set_footer(text="No olvides realizar el comando $mmn+s para guardar las notas", icon_url="https://i.imgur.com/h4z8Of1.png")
+                await channel.send(f"{owner.mention}", embed=embed)
+                value['notified'] = True
+                
+                with open('assets\\bitesthedust.json', 'w') as file:
+                    json.dump(data, file, indent = 4)
 
     # Comando para colocar color al embed del bot Mudae
     @commands.hybrid_command(name="embedcolor", description="Comando para colocar color al embed del personaje en el bot Mudae", aliases=['ec'])
@@ -541,16 +567,17 @@ class Mudae(commands.Cog):
         print(error)
         await ctx.send(embed=discord.Embed(description=f"❌ Inserta un gif o un enlace", color=COLOR))
 
-    # Comando para ver el tiempo exacto que falta para el $bitesthedust requiem
-    @commands.hybrid_command(name="tiemporestante", description="Comando para ver el tiempo exacto que falta para el $bitesthedust requiem", aliases=['tr'])
+    # Comando para ver el tiempo que falta para el '$bitesthedust requiem' en el servidor
+    @commands.hybrid_command(name="tiemporestante", description="Comando para ver el tiempo que falta para el '$bitesthedust requiem' en el servidor", aliases=['tr'])
     async def tiemporestante(self, ctx):
-        f = open("assets/datetime.txt", "r")
-        time = datetime.strptime(f.read(26), '%Y-%m-%d %H:%M:%S.%f')
-        f.close()
+        with open('assets\\bitesthedust.json', 'r') as file:
+            data = json.load(file)
         
-        time += timedelta(days=14, hours=18)
-        
-        now_time = datetime.now()
+        created_at = data[str(ctx.guild.id)]['created_at']
+        time = datetime.strptime(created_at, '%Y-%m-%d %H:%M:%S.%f%z')
+
+        time += timedelta(days=15)
+        now_time = datetime.now(time.tzinfo)
         diff = time - now_time
         
         dias = diff.days
@@ -564,6 +591,9 @@ class Mudae(commands.Cog):
         embed.timestamp = time
         embed.set_footer(text="Fecha", icon_url="https://i.imgur.com/fEH1X8C.png")
         await ctx.send(embed=embed)
+    @tiemporestante.error
+    async def tiemporestante_error(self, ctx, error):
+        print(error)
 
     # Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes en Mudae
     @commands.hybrid_command(name="kakera", description="Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes", aliases=['k', 'K'])
