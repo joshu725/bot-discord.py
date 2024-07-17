@@ -28,25 +28,29 @@ class Mudae(commands.Cog):
             f.write(str(message.created_at))
             f.close()
 
-    # Cada 5 minutos se comprueba que la fecha actual sea mayor a la fecha indicada en 'datetime.txt' + 15 dias
-    @tasks.loop(minutes=5.0)
+    # Cada 3 minutos se comprueba que la fecha actual sea mayor a la fecha indicada en 'datetime.txt' + 15 dias
+    @tasks.loop(minutes=3.0)
     async def comprobarTiempo(self):
         f = open("assets/datetime.txt", "r")
         time = datetime.strptime(f.read(26), '%Y-%m-%d %H:%M:%S.%f')
         f.close()
         
-        time += timedelta(days=14, hours=18)
-        now_time = datetime.now()
+        time += timedelta(days=15)
+        now_time = datetime.now(time.tzinfo)
         
         if now_time > time:
             channel = await self.bot.fetch_channel(1247267606415806496)
             
-            embed = discord.Embed(title="Kakera :)", description=f"El siguiente comando está disponible\n```$bitesthedust requiem```", colour=COLOR)
+            embed = discord.Embed(title="¡Kakera!", description=f"El siguiente comando está disponible:\n```$bitesthedust requiem```", color=COLOR)
             embed.set_thumbnail(url="https://i.imgur.com/FDBj4Oe.gif")
             embed.set_image(url="https://imgur.com/Fiptqgp.gif")
+            embed.set_footer(text="No olvides realizar el comando $mmn+s para guardar las notas", icon_url="https://i.imgur.com/h4z8Of1.png")
 
             await channel.send("<@263880901094539266> <@235197855529304064>", embed=embed)
             self.comprobarTiempo.stop()
+    @comprobarTiempo.error
+    async def comprobarTiempo_error(self, ctx, error):
+        print(error)
 
     # Comando para colocar color al embed del bot Mudae
     @commands.hybrid_command(name="embedcolor", description="Comando para colocar color al embed del personaje en el bot Mudae", aliases=['ec'])
@@ -180,9 +184,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
@@ -205,9 +209,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsW(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         class cropButtonsH(discord.ui.View):
             def __init__(self, img_original : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
@@ -239,9 +243,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='🔽', style=discord.ButtonStyle.grey)
@@ -264,9 +268,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.png")],
                             view=cropButtonsH(self.img_original, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         if enlace == None:
             if ctx.message.attachments:
@@ -371,9 +375,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
@@ -396,9 +400,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsW(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         class cropButtonsH(discord.ui.View):
             def __init__(self, img_original : Image, marco : Image, idAutor : int, left : int, top : int, right : int, bottom : int):
@@ -431,9 +435,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                     
             
             @discord.ui.button(emoji='🔽', style=discord.ButtonStyle.grey)
@@ -456,9 +460,9 @@ class Mudae(commands.Cog):
                             attachments=[discord.File("img/imagen_cortada.gif")],
                             view=cropButtonsH(self.img_original, self.marco, self.idAutor, self.left, self.top, self.right, self.bottom))
                     else:
-                        await interaction.response.send_message(embed=discord.Embed(description=f"❌・Límite de la imagen", color=COLOR), ephemeral=True)
+                        await interaction.response.send_message(embed=discord.Embed(description=f"❌ Límite de la imagen", color=COLOR), ephemeral=True)
                 else:
-                    await interaction.response.send_message(embed=discord.Embed(description=f"❌・Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
+                    await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
 
         if enlace == None:
             if ctx.message.attachments:

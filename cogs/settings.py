@@ -42,6 +42,15 @@ class Settings(commands.Cog):
     async def reload_error(self, ctx, error):
         print(error)
         await ctx.message.add_reaction('❌')
+    
+    # Comando para para ver la información de un mensaje con su ID
+    @commands.command(aliases=['m'])
+    @commands.has_permissions(administrator=True)
+    async def message(self, ctx, channelID : int, msgID : int):
+        await ctx.message.delete()
+        channel = self.bot.get_channel(channelID)
+        msg = await self.bot.get_message(channel, msgID)
+        print(msg)
 
 async def setup(bot):
     await bot.add_cog(Settings(bot))
