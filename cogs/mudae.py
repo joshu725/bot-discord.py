@@ -562,48 +562,44 @@ class Mudae(commands.Cog):
         await ctx.send(embed=embed)
 
     # Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes en Mudae
-    @commands.hybrid_command(name="kakera", description="Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes", aliases=['k'])
+    @commands.hybrid_command(name="kakera", description="Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes", aliases=['k', 'K'])
     async def kakera(self, ctx):
         mayor = 0
         enlaceMayor = ""
+        actual = datetime.now(ctx.message.created_at.tzinfo)
         async for message in ctx.channel.history(limit=100):
             if message.author.id == 432610292342587392:
-                if message.interaction:
-                    if message.interaction.user.id == ctx.author.id:
-                        if not message.components:
-                            if (datetime.now(message.created_at.tzinfo) - message.created_at).seconds < 90:
-                                if message.embeds:
-                                    for embed in message.embeds:
-                                        lastEmbed = embed.to_dict()
+                try:
+                    embed = message.embeds[0].to_dict()
+                    if "footer" not in embed or "icon_url" not in embed["footer"]:
+                        if (actual - message.created_at).seconds < 90:
+                            pattern = r"\*\*(\d+)\*\*<:kakera:469835869059153940>"
+                            match = re.search(pattern, embed["description"])
+                            number = int(match.group(1))
+                            
+                            if (number > mayor):
+                                mayor = number
+                                enlaceMayor = message.jump_url
+                                creadoMayor = message.created_at
+                                msg = message
+                                imgPj = embed["image"]["url"]
+                                nombrePj = embed['author']['name']
+                except:
+                    continue
 
-                                    if "footer" not in lastEmbed or "icon_url" not in lastEmbed["footer"]:
-                                        pattern = r"\*\*(\d+)\*\*<:kakera:469835869059153940>"
-                                        match = re.search(pattern, lastEmbed["description"])
-                                        number = int(match.group(1))
-                                        
-                                        if (number > mayor):
-                                            mayor = number
-                                            enlaceMayor = message.jump_url
-                                            creadoMayor = message.created_at
-                                            msg = message
-                                            imgPj = lastEmbed["image"]["url"]
-                                            nombrePj = lastEmbed['author']['name']
-        
         if not enlaceMayor == "":
-            actual = datetime.now(creadoMayor.tzinfo)
             await msg.add_reaction(":kakera:1260465357085474968")
-            
             embed = discord.Embed(title=f"{nombrePj}・{mayor} <:kakera:1260465357085474968>", color=COLOR)
             embed.add_field(name=f"💬 Enlace al mensaje", value=enlaceMayor, inline=False)
             embed.set_footer(text=f"Tiempo restante: {90 - (actual - creadoMayor).seconds} segundos", icon_url="https://i.imgur.com/fEH1X8C.png")
             embed.set_thumbnail(url=imgPj)
             await ctx.send(embed=embed)
         else:
-            await ctx.send(embed=discord.Embed(description=f"❌ No se encontró un tiro tuyo reclamable (comandos slash)", color=COLOR), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ No se encontró un tiro reclamable de Mudae", color=COLOR), ephemeral=True)
     @kakera.error
     async def kakera_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=discord.Embed(description=f"❌ No se encontró un tiro tuyo reclamable (comandos slash)", color=COLOR), ephemeral=True)
+        await ctx.send(embed=discord.Embed(description=f"❌ No se encontró un tiro reclamable de Mudae", color=COLOR), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Mudae(bot))
