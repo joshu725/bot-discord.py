@@ -1,5 +1,4 @@
 __pycache__/
 video/
 img/
-token.txt
-imgur-clientid.txt
+.env

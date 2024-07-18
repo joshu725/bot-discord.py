@@ -4,6 +4,7 @@ from discord.ext import commands
 import os
 import asyncio
 from datetime import datetime
+from dotenv import load_dotenv
 
 # Configuración inicial
 bot = commands.Bot(command_prefix='!', intents=discord.Intents.all())
@@ -37,14 +38,14 @@ async def load():
 # --- Inicio de bot ---
 
 # Lectura de archivo que contiene el token del bot
-with open("token.txt") as file:
-    token = file.read()
+load_dotenv()
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 # Función principal que carga los cogs e inicia el bot
 async def main():
     async with bot:
         await load()
-        await bot.start(token)
+        await bot.start(TOKEN)
 
 # Se ejectuta la función principal
 asyncio.run(main())

@@ -9,8 +9,12 @@ from pytube import YouTube
 import pyktok as pyk
 import instaloader
 import os
+from dotenv import load_dotenv
 
 COLOR = 0xb2b2ff
+
+load_dotenv()
+IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 
 # Clase principal
 class Utility(commands.Cog):
@@ -224,9 +228,7 @@ class Utility(commands.Cog):
     @app_commands.describe(enlace = "Enlace de la imagen o gif")
     async def imgur(self, ctx, enlace : str):
         await ctx.defer()
-        with open("assets/imgur-clientid.txt") as file:
-            client_id = file.read()
-        headers = {"Authorization": f"Client-ID {client_id}"}
+        headers = {"Authorization": f"Client-ID {IMGUR_CLIENT_ID}"}
         data = {"image": enlace}
 
         response = requests.post("https://api.imgur.com/3/upload", headers=headers, data=data)
