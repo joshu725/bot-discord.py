@@ -645,13 +645,13 @@ class Mudae(commands.Cog):
         nombres = re.findall(patron, embed["description"])
         nombre_personajes = ""
         for nombre in nombres:
-            nombre_personajes += f"${nombre[1]}\n"
+            nombre_personajes += f"$ {nombre[1]}\n"
         embed = discord.Embed(title="Lista de personajes", description=nombre_personajes, color=COLOR)
         await ctx.send(embed=embed)
     @personajes.error
     async def personajes_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=createEmbedInfo("personajes", "Muestra la lista limpia de **personajes** del $top", "!personajes 'mensaje_id'", ctx.author.avatar))
+        await ctx.send(embed=createEmbedInfo("personajes", "Muestra la lista limpia de **personajes** del **$top**", "!personajes 'mensaje_id'", ctx.author.avatar))
 
 async def setup(bot):
     await bot.add_cog(Mudae(bot))
