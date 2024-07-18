@@ -50,8 +50,11 @@ class Settings(commands.Cog):
         await ctx.message.delete()
         channel = self.bot.get_channel(channel_id)
         message = await channel.fetch_message(message_id)
-        print(message)
+        print("--------------------")
+        print(message.embeds[0].to_dict())
+        print("---")
         print(message.created_at)
+        print("--------------------")
 
 async def setup(bot):
     await bot.add_cog(Settings(bot))

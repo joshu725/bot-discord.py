@@ -635,5 +635,29 @@ class Mudae(commands.Cog):
         print(error)
         await ctx.send(embed=discord.Embed(description=f"❌ No se encontró un tiro reclamable de Mudae", color=COLOR), ephemeral=True)
 
+    # Comando mostrar la lista limpia de personajes del $top de Mudae
+    @commands.hybrid_command(name="personajes", description="Muestra la lista limpia de personajes del $top de Mudae")
+    @app_commands.describe(id="ID del mensaje con la lista de personajes")
+    async def personajes(self, ctx, id : str):
+        message = await ctx.channel.fetch_message(int(id))
+        embed = message.embeds[0].to_dict()
+        patron = r"\*\*(.*?)\*\* - \*\*(.*?)\*\* -"
+        nombres = re.findall(patron, embed["description"])
+        nombre_personajes = ""
+        for nombre in nombres:
+            nombre_personajes += f"${nombre[1]}\n"
+        embed = discord.Embed(title="Lista de personajes", description=nombre_personajes, color=COLOR)
+        await ctx.send(embed=embed)
+    @personajes.error
+    async def personajes_error(self, ctx, error):
+        print(error)
+        await ctx.send(embed=createEmbedInfo("personajes", "Muestra la lista limpia de **personajes** del $top", "!personajes 'mensaje_id'", ctx.author.avatar))
+
 async def setup(bot):
     await bot.add_cog(Mudae(bot))
+
+def createEmbedInfo(comando : str, especificacion : str, formato : str, urlIcono : str):
+    embed = discord.Embed(description = especificacion, color = COLOR)
+    embed.set_author(name = comando, icon_url = urlIcono)
+    embed.add_field(name = "🗒️ Formato", value=f"`{formato}`", inline=False)
+    return embed
