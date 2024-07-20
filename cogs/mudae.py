@@ -606,7 +606,11 @@ class Mudae(commands.Cog):
                 try:
                     embed = message.embeds[0].to_dict()
                     if "footer" not in embed or "icon_url" not in embed["footer"]:
-                        if (actual - message.created_at).seconds < 90:
+                        if message.interaction:
+                            tiempoRestante = 90
+                        else:
+                            tiempoRestante = 45
+                        if (actual - message.created_at).seconds < tiempoRestante:
                             pattern = r"\*\*(\d+)\*\*<:kakera:469835869059153940>"
                             match = re.search(pattern, embed["description"])
                             number = int(match.group(1))
@@ -618,6 +622,7 @@ class Mudae(commands.Cog):
                                 msg = message
                                 imgPj = embed["image"]["url"]
                                 nombrePj = embed['author']['name']
+                                tiempoPj = tiempoRestante
                 except:
                     continue
 
@@ -625,7 +630,7 @@ class Mudae(commands.Cog):
             await msg.add_reaction(":kakera:1260465357085474968")
             embed = discord.Embed(title=f"{nombrePj}・{mayor} <:kakera:1260465357085474968>", color=COLOR)
             embed.add_field(name=f"💬 Enlace al mensaje", value=enlaceMayor, inline=False)
-            embed.set_footer(text=f"Tiempo restante: {90 - (actual - creadoMayor).seconds} segundos", icon_url="https://i.imgur.com/fEH1X8C.png")
+            embed.set_footer(text=f"Tiempo restante: {tiempoPj - (actual - creadoMayor).seconds} segundos", icon_url="https://i.imgur.com/fEH1X8C.png")
             embed.set_thumbnail(url=imgPj)
             await ctx.send(embed=embed)
         else:
