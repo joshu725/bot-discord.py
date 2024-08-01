@@ -6,6 +6,7 @@ from colorthief import ColorThief
 import requests
 from urllib.parse import urlparse
 from pytube import YouTube
+import yt_dlp
 import pyktok as pyk
 import instaloader
 import os
@@ -286,6 +287,35 @@ class Utility(commands.Cog):
     async def instaimg_error(self, ctx, error):
         print(error)
         await ctx.send(embed=createEmbedInfo("instaimg", "Descarga y envia imagenes de un enlace en **Instagram**", "!instaimg 'url'", ctx.author.avatar))
+
+    # Comando para descargar y enviar un video de Twitter
+    @commands.hybrid_command(name="twitter", description="Comando para descargar y enviar un video de Twitter (X)")
+    @app_commands.describe(enlace = "Enlace de Twitter (X)")
+    async def twitter(self, ctx, enlace : str):
+        await ctx.defer()
+        
+        if os.path.exists("video/twitter.mp4"):
+            os.remove("video/twitter.mp4")
+        
+        try:
+            ydl_opts = {
+                'format': 'best',
+                'outtmpl': f'video/twitter.%(ext)s'
+            }
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([enlace])
+            
+            await ctx.send(file=discord.File("video/twitter.mp4"))
+        except:
+            await ctx.send(embed=discord.Embed(description=f"❌ Error al descargar el video", color=COLOR), ephemeral=True)
+    @twitter.error
+    async def twitter_error(self, ctx, error):
+        print(error)
+        if str(error) == "Hybrid command raised an error: Command 'twitter' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
+            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
+        else:
+            await ctx.send(embed=createEmbedInfo("twitter", "Descarga y envía un video de **Twitter** (X)", "!twitter 'url'", ctx.author.avatar))
+
 
 async def setup(bot):
     await bot.add_cog(Utility(bot))
