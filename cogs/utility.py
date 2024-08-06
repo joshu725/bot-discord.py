@@ -5,7 +5,6 @@ from discord import app_commands
 from colorthief import ColorThief
 import requests
 from urllib.parse import urlparse
-from pytube import YouTube
 import yt_dlp
 import pyktok as pyk
 import instaloader
@@ -128,21 +127,22 @@ class Utility(commands.Cog):
     @commands.hybrid_command(name="youtube", description="Comando para descargar y enviar un video de Youtube")
     @app_commands.describe(enlace = "Enlace de Youtube")
     async def youtube(self, ctx, enlace : str):
-        try: 
-            yt = YouTube(enlace) 
-        except:
-            return await ctx.send(embed=discord.Embed(description=f"❌ No se ha encontrado el video", color=COLOR), ephemeral=True)
-        
         await ctx.defer()
         
-        # Obtener la mejor calidad disponible
-        video = yt.streams.get_highest_resolution()
-
-        try: 
-            video.download(output_path="video", filename="youtube.mp4")
+        if os.path.exists("video/youtube.mp4"):
+            os.remove("video/youtube.mp4")
+        
+        try:
+            ydl_opts = {
+                'format': 'bestvideo[height<=720][vcodec^=avc1]+bestaudio/best',
+                'outtmpl': f'video/youtube.%(ext)s'
+            }
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([enlace])
+            
             await ctx.send(file=discord.File("video/youtube.mp4"))
-        except: 
-            await ctx.send(embed=discord.Embed(description=f"❌ Error al descargar el video", color=COLOR))
+        except:
+            await ctx.send(embed=discord.Embed(description=f"❌ Error al descargar el video", color=COLOR), ephemeral=True)
     @youtube.error
     async def youtube_error(self, ctx, error):
         print(error)
