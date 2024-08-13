@@ -594,6 +594,7 @@ class Mudae(commands.Cog):
     @tiemporestante.error
     async def tiemporestante_error(self, ctx, error):
         print(error)
+        await ctx.send(embed=createEmbedInfo("tiemporestante", "Muestra el tiempo restante para realizar el comando **$bitesthedust** de Mudae", "!tiemporestante", ctx.author.avatar))
 
     # Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes en Mudae
     @commands.hybrid_command(name="kakera", description="Comando para mandar enlace del mensaje con el personaje mas alto en kakera de los tiros recientes", aliases=['k', 'K'])
