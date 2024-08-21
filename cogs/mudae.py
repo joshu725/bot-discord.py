@@ -143,7 +143,7 @@ class Mudae(commands.Cog):
                             embedImg.set_image(url=self.url)
                             embedImg.set_footer(text=f"{self.index+1}")
 
-                            await interaction.response.edit_message(embed=embedImg)
+                            await interaction.response.edit_message(content=f"$ec {self.author} $#{self.palette[self.index][0]:02x}{self.palette[self.index][1]:02x}{self.palette[self.index][2]:02x}", embed=embedImg)
                         
                         @discord.ui.button(emoji='▶️', style=discord.ButtonStyle.grey)
                         async def changeRight(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -160,7 +160,7 @@ class Mudae(commands.Cog):
                             embedImg.set_image(url=self.url)
                             embedImg.set_footer(text=f"{self.index+1}")
 
-                            await interaction.response.edit_message(embed=embedImg)
+                            await interaction.response.edit_message(content=f"$ec {self.author} $#{self.palette[self.index][0]:02x}{self.palette[self.index][1]:02x}{self.palette[self.index][2]:02x}", embed=embedImg)
                         
                         @discord.ui.button(emoji='🗑️', style=discord.ButtonStyle.red)
                         async def changeDelete(self, interaction: discord.Interaction, button: discord.ui.Button):
@@ -169,7 +169,7 @@ class Mudae(commands.Cog):
                             else:
                                 await interaction.response.send_message(embed=discord.Embed(description=f"❌ Necesitas haber hecho el comando", color=COLOR), ephemeral=True)
                             
-                    await ctx.send(embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, ctx.author.id))
+                    await ctx.send(f"$ec {lastEmbed['author']['name']} $#{palette[0][0]:02x}{palette[0][1]:02x}{palette[0][2]:02x}", embed=embedImg, view=changeButtons(lastEmbed['author']['name'], palette, image, ctx.author.id))
                     return
     @embedcolor.error
     async def embedcolor_error(self, ctx, error):
