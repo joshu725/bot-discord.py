@@ -18,14 +18,16 @@ class Settings(commands.Cog):
     async def help(self, ctx):
         embed = discord.Embed(title = "Acerca de Choppa", description=f"- Este es un bot personal creado con el fin de apoyar y divertir con comandos interactivos.", color=0xffa3a3)
 
-        embed.add_field(name=f"🔧 Utilidad", value="`avatar`, `say`, `emoji`, `fxtwitter`, `reemplazar`, `youtube`, `tiktok`, `reel`, `instaimg`, `imgur`, `twitter`", inline=False)
+        embed.add_field(name=f"🔧 Utilidad", value="`avatar`, `say`, `emoji`, `fxtwitter`, `reemplazar`", inline=False)
+        embed.add_field(name=f"🖼️ Multimedia", value="`youtube`, `twitter`, `tiktok`, `reel`, `instaimg`, `imgur`", inline=False)
         embed.add_field(name=f"🎨 Entretenimiento", value="`apuntar`, `quieres`, `logro`, `love`", inline=False)
         embed.add_field(name=f"🛠️ Moderación", value="`prune`, `kick`, `ban`, `mute`, `unmute`", inline=False)
         embed.add_field(name=f"<:kakera:1260465357085474968> Mudae", value="`embedcolor`, `cortarimagen`, `cortargif`, `tiemporestante`, `kakera`, `personajes`", inline=False)
 
         embed.set_image(url="https://i.imgur.com/SOZfVMH.jpeg")
 
-        embed.set_footer(text=f"© im.joshi & ninomeow", icon_url=ctx.guild.icon)
+        owner = await self.bot.fetch_user(235197855529304064)
+        embed.set_footer(text=f"© im.joshi", icon_url=owner.avatar)
         embed.set_thumbnail(url=self.bot.user.avatar)
 
         await ctx.send(embed=embed)
