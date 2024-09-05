@@ -7,7 +7,7 @@ Choppa es un bot de Discord desarrollado con Python, que ofrece una variedad de 
 ## Comandos relacionados con el bot Mudae
 Choppa ofrece varios comandos que son muy útiles a la hora de utilizar el bot de Mudae, como por ejemplo:
 - `embedcolor` - Proporciona hasta 5 colores hexadecimales que se relacionan con la imagen/GIF del personaje.
-- `cortarimagen` & `cortargif` - Permiten cortar la imagen/gif proporcionada en una relación de aspecto y tamaño iguales a los de las imágenes de Mudae. Además, se le agrega el marco blanco.
+- `cortarimagen` & `cortargif` - Permiten cortar la imagen/GIF proporcionada en una relación de aspecto y tamaño iguales a los de las imágenes de Mudae. Además, se le agrega el marco blanco.
 - `tiemporestante` - Muestra la cantidad de tiempo restante para el próximo $bitesthedust.
 - `kakera` - Reacciona y envía un mensaje con un enlace al mensaje del personaje con más kakera de los tiros recientes.
 - `personajes` - Proporciona los personajes del $top, pero con un $ al inicio y dejando solamente el nombre del personaje.
