@@ -152,32 +152,38 @@ class Utility(commands.Cog):
             await ctx.send(embed=createEmbedInfo("youtube", "Descarga y envía un video o short de **YouTube**", "!youtube 'url'", ctx.author.avatar))
 
     # Comando para descargar y enviar el audio de un video de Youtube
-    @commands.hybrid_command(name="audio_youtube", description="Comando para descargar y enviar el audio de un video de Youtube")
+    @commands.hybrid_command(name="mp3youtube", description="Comando para descargar y enviar el audio de un video de Youtube")
     @app_commands.describe(enlace = "Enlace de Youtube")
-    async def audio_youtube(self, ctx, enlace : str):
+    async def mp3youtube(self, ctx, enlace : str):
         await ctx.defer()
-        
-        if os.path.exists("audio/youtube.m4a"):
-            os.remove("audio/youtube.m4a")
-        
+
         try:
             ydl_opts = {
                 'format': 'bestaudio/best',
-                'outtmpl': f'audio/youtube.%(ext)s'
+                'outtmpl': f'audio/%(title)s.%(ext)s',
+                'postprocessors': [{
+                    'key': 'FFmpegExtractAudio',
+                    'preferredcodec': 'mp3',
+                    'preferredquality': '192',
+            }],
+            'prefer_ffmpeg': True,
             }
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([enlace])
             
-            await ctx.send(file=discord.File("audio/youtube.m4a"))
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info_dict = ydl.extract_info(enlace, download=False)
+                file_path = ydl.prepare_filename(info_dict).replace('.m4a', '.mp3')
+                ydl.download([enlace])
+
+            await ctx.send(file=discord.File(file_path))
         except:
             await ctx.send(embed=discord.Embed(description=f"❌ Error al descargar el audio del video", color=COLOR), ephemeral=True)
-    @audio_youtube.error
-    async def audio_youtube_error(self, ctx, error):
+    @mp3youtube.error
+    async def mp3youtube_error(self, ctx, error):
         print(error)
-        if str(error) == "Hybrid command raised an error: Command 'audio_youtube' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
+        if str(error) == "Hybrid command raised an error: Command 'mp3youtube' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
             await ctx.send(embed=discord.Embed(description=f"❌ El audio pesa más de 25mb", color=COLOR), ephemeral=True)
         else:
-            await ctx.send(embed=createEmbedInfo("audio_youtube", "Descarga y envía el audio de un video de **YouTube**", "!audio_youtube 'url'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("mp3youtube", "Descarga y envía el audio de un video de **YouTube**", "!mp3youtube 'url'", ctx.author.avatar))
 
     # Comando para descargar y enviar un video de TikTok
     @commands.hybrid_command(name="tiktok", description="Comando para descargar y enviar un video de TikTok")
