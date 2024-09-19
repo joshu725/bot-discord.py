@@ -1,5 +1,6 @@
 __pycache__/
 video/
 img/
+audio/
 .env
 assets/bitesthedust.json
