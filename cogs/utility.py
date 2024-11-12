@@ -148,7 +148,7 @@ class Utility(commands.Cog):
     async def youtube_error(self, ctx, error):
         print(error)
         if str(error) == "Hybrid command raised an error: Command 'youtube' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("youtube", "Descarga y envía un video o short de **YouTube**", "!youtube 'url'", ctx.author.avatar))
 
@@ -182,7 +182,7 @@ class Utility(commands.Cog):
     async def mp3youtube_error(self, ctx, error):
         print(error)
         if str(error) == "Hybrid command raised an error: Command 'mp3youtube' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El audio pesa más de 25mb", color=COLOR), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ El audio pesa más de 25 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("mp3youtube", "Descarga y envía el audio de un video de **YouTube**", "!mp3youtube 'url'", ctx.author.avatar))
 
@@ -201,55 +201,59 @@ class Utility(commands.Cog):
     async def tiktok_error(self, ctx, error):
         print(error)
         if str(error) == "Hybrid command raised an error: Command 'tiktok' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("tiktok", "Descarga y envía un video de **TikTok**", "!tiktok 'url'", ctx.author.avatar))
 
-    # Comando para descargar y enviar un reel de Instagram
-    @commands.hybrid_command(name="reel", description="Comando para descargar y enviar uno o varios videos de Instagram")
-    @app_commands.describe(enlace = "Enlace del reel")
+    # Comando para descargar y enviar un Reel de Instagram
+    @commands.hybrid_command(name="reel", description="Comando para descargar y enviar un Reel de Instagram")
+    @app_commands.describe(enlace = "Enlace del Reel")
     async def reel(self, ctx, enlace : str):
-        await ctx.defer()
-        
-        # Crear una instancia de Instaloader
-        reel = instaloader.Instaloader()
-        
-        # Iniciamos sesion en Intagram
-        # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
-        reel.load_session_from_file(INSTAGRAM_USER)
-        
-        # Extraer el shortcode de la URL
-        shortcode = enlace.split("/")[-2]
-
-        # Descargar el video
-        post = instaloader.Post.from_shortcode(reel.context, shortcode)
-        reel.download_post(post, "download")
-        
-        # Se elimina el anterior video
-        if os.path.exists("video/instagram/reel_1.mp4"):
-            for file in os.listdir(os.path.join("video", "instagram")):
-                os.remove(os.path.join(os.path.join("video", "instagram"), file))
-
-        i = 0
-        
-        # Se renombra y se mueve el video, ademas de borrar los demás archivos innecesarios
-        for file in os.listdir("download"):
-            if file.endswith(".mp4"):
-                i += 1
-                os.rename(os.path.join("download", file), f"video/instagram/reel_{i}.mp4")
-            else:
-                os.remove(os.path.join("download", file))
-        os.rmdir("download")
-        
-        for index in range(0, i):
-            await ctx.send(file=discord.File(f"video/instagram/reel_{index+1}.mp4"))
+        if "/reel/" in enlace or "/reels/" in enlace:
+            await ctx.defer()
+            
+            # Crear una instancia de Instaloader
+            reel = instaloader.Instaloader()
+            
+            # Iniciamos sesion en Intagram
+            # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
+            reel.load_session_from_file(INSTAGRAM_USER)
+            
+            # Extraer el shortcode de la URL
+            shortcode = enlace.split("/")[-2]
+            
+            # Descarga el Reel
+            post = instaloader.Post.from_shortcode(reel.context, shortcode)
+            reel.filename_pattern = f"@{post.owner_username}_{shortcode}"
+            reel.download_post(post, "download")
+            
+            # Se elimina el anterior Reel
+            if os.path.exists("video/instagram/"):
+                for file in os.listdir(os.path.join("video", "instagram")):
+                    os.remove(os.path.join(os.path.join("video", "instagram"), file))
+            
+            # Se renombra y se mueve el Reel, ademas de borrar los demás archivos innecesarios
+            for file in os.listdir("download"):
+                ruta_origen = os.path.join("download", file)
+                ruta_destino = os.path.join("video", "instagram", file)
+                
+                if file.endswith(".mp4"):
+                    os.rename(ruta_origen, ruta_destino)
+                else:
+                    os.remove(ruta_origen)
+            
+            os.rmdir("download")
+            
+            await ctx.send(file=discord.File(f"video/instagram/{reel.filename_pattern}.mp4"))
+        else:
+            await ctx.send(embed=discord.Embed(description=f"❌ El enlace no es un Reel, utiliza el comando `/instagram` para una publicación de Instagram.", color=COLOR), ephemeral=True)
     @reel.error
     async def reel_error(self, ctx, error):
         print(error)
         if str(error) == "Hybrid command raised an error: Command 'reel' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ El Reel pesa más de 25 MB", color=COLOR), ephemeral=True)
         else:
-            await ctx.send(embed=createEmbedInfo("reel", "Descarga y envía uno o varios videos de **Instagram**", "!reel 'url'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("reel", "Descarga y envía un Reel de **Instagram**", "!reel 'url'", ctx.author.avatar))
 
     # Comando para visualizar en grande un emoji custom
     @commands.hybrid_command(name="emoji", description="Comando para visualizar en grande un emoji custom", aliases=["e"])
@@ -355,7 +359,7 @@ class Utility(commands.Cog):
     async def twitter_error(self, ctx, error):
         print(error)
         if str(error) == "Hybrid command raised an error: Command 'twitter' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25mb", color=COLOR), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 25 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("twitter", "Descarga y envía un video de **Twitter** (X)", "!twitter 'url'", ctx.author.avatar))
 
