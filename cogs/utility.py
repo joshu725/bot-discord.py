@@ -15,6 +15,7 @@ COLOR = 0xb2b2ff
 
 load_dotenv()
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
+INSTAGRAM_USER = os.getenv("INSTAGRAM_USER")
 
 # Clase principal
 class Utility(commands.Cog):
@@ -213,6 +214,10 @@ class Utility(commands.Cog):
         # Crear una instancia de Instaloader
         reel = instaloader.Instaloader()
         
+        # Iniciamos sesion en Intagram
+        # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
+        reel.load_session_from_file(INSTAGRAM_USER)
+        
         # Extraer el shortcode de la URL
         shortcode = enlace.split("/")[-2]
 
@@ -291,6 +296,10 @@ class Utility(commands.Cog):
         
         # Crear una instancia de Instaloader
         reel = instaloader.Instaloader()
+        
+        # Iniciamos sesion en Intagram
+        # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
+        reel.load_session_from_file(INSTAGRAM_USER)
         
         # Extraer el shortcode de la URL
         shortcode = enlace.split("/")[-2]
