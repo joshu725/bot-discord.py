@@ -205,8 +205,8 @@ class Utility(commands.Cog):
         else:
             await ctx.send(embed=createEmbedInfo("tiktok", "Descarga y envía un video de **TikTok**", "!tiktok 'url'", ctx.author.avatar))
 
-    # Comando para descargar y enviar un Reel de Instagram
-    @commands.hybrid_command(name="reel", description="Comando para descargar y enviar un Reel de Instagram")
+    # Comando para descargar y enviar un Reel en Instagram
+    @commands.hybrid_command(name="reel", description="Comando para descargar y enviar un Reel en Instagram")
     @app_commands.describe(enlace = "Enlace del Reel")
     async def reel(self, ctx, enlace : str):
         if "/reel/" in enlace or "/reels/" in enlace:
@@ -224,7 +224,7 @@ class Utility(commands.Cog):
             
             # Descarga el Reel
             post = instaloader.Post.from_shortcode(reel.context, shortcode)
-            reel.filename_pattern = f"@{post.owner_username}_{shortcode}"
+            reel.filename_pattern = f"{post.owner_username}_{shortcode}"
             reel.download_post(post, "download")
             
             # Se elimina el anterior Reel
@@ -246,14 +246,14 @@ class Utility(commands.Cog):
             
             await ctx.send(file=discord.File(f"video/instagram/{reel.filename_pattern}.mp4"))
         else:
-            await ctx.send(embed=discord.Embed(description=f"❌ El enlace no es un Reel, utiliza el comando `/instagram` para una publicación de Instagram.", color=COLOR), ephemeral=True)
+            await ctx.send(embed=discord.Embed(description=f"❌ El enlace no es un Reel, utiliza el comando `/instagram` para una publicación en Instagram.", color=COLOR), ephemeral=True)
     @reel.error
     async def reel_error(self, ctx, error):
         print(error)
         if str(error) == "Hybrid command raised an error: Command 'reel' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
             await ctx.send(embed=discord.Embed(description=f"❌ El Reel pesa más de 25 MB", color=COLOR), ephemeral=True)
         else:
-            await ctx.send(embed=createEmbedInfo("reel", "Descarga y envía un Reel de **Instagram**", "!reel 'url'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("reel", "Descarga y envía un Reel en **Instagram**", "!reel 'url'", ctx.author.avatar))
 
     # Comando para visualizar en grande un emoji custom
     @commands.hybrid_command(name="emoji", description="Comando para visualizar en grande un emoji custom", aliases=["e"])
@@ -292,48 +292,51 @@ class Utility(commands.Cog):
         print(error)
         await ctx.send(embed=createEmbedInfo("imgur", "Sube un enlace de imagen o gif a **Imgur**", "!imgur 'url'", ctx.author.avatar))
 
-    # Comando para descargar y enviar un post de Instagram
-    @commands.hybrid_command(name="instaimg", description="Comando para descargar y enviar imagenes de un enlace de Instagram")
-    @app_commands.describe(enlace = "Enlace del post")
-    async def instaimg(self, ctx, enlace : str):
-        await ctx.defer()
-        
-        # Crear una instancia de Instaloader
-        reel = instaloader.Instaloader()
-        
-        # Iniciamos sesion en Intagram
-        # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
-        reel.load_session_from_file(INSTAGRAM_USER)
-        
-        # Extraer el shortcode de la URL
-        shortcode = enlace.split("/")[-2]
-
-        # Descargar el video
-        post = instaloader.Post.from_shortcode(reel.context, shortcode)
-        reel.download_post(post, "download")
-        
-        # Se elimina el anterior video
-        if os.path.exists("img/instagram/img_1.jpg"):
-            for file in os.listdir(os.path.join("img", "instagram")):
-                os.remove(os.path.join(os.path.join("img", "instagram"), file))
-
-        i = 0
-        
-        # Se renombra y se mueve el video, ademas de borrar los demás archivos innecesarios
-        for file in os.listdir("download"):
-            if file.endswith(".jpg"):
-                i += 1
-                os.rename(os.path.join("download", file), f"img/instagram/img_{i}.jpg")
-            else:
-                os.remove(os.path.join("download", file))
-        os.rmdir("download")
-        
-        for index in range(0, i):
-            await ctx.send(file=discord.File(f"img/instagram/img_{index+1}.jpg"))
-    @instaimg.error
-    async def instaimg_error(self, ctx, error):
+    # Comando para descargar y enviar imagenes/videos de una publicación en Instagram
+    @commands.hybrid_command(name="instagram", description="Comando para descargar y enviar imagenes/videos de una publicación en Instagram")
+    @app_commands.describe(enlace = "Enlace de la publicación en Instagram")
+    async def instagram(self, ctx, enlace : str):
+        if "/p/" in enlace:
+            await ctx.defer()
+            
+            # Crear una instancia de Instaloader
+            reel = instaloader.Instaloader()
+            
+            # Iniciamos sesion en Intagram
+            # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
+            reel.load_session_from_file(INSTAGRAM_USER)
+            
+            # Extraer el shortcode de la URL
+            shortcode = enlace.split("/")[-2]
+            
+            # Descargar los archivos de la publicación
+            post = instaloader.Post.from_shortcode(reel.context, shortcode)
+            reel.filename_pattern = f"{post.owner_username}_{shortcode}"
+            reel.download_post(post, "download")
+            
+            # Se eliminan los anteriores archivos
+            if os.path.exists("img/instagram/"):
+                for file in os.listdir(os.path.join("img", "instagram")):
+                    os.remove(os.path.join(os.path.join("img", "instagram"), file))
+            
+            # Se renombra y se mueve los archivos
+            for file in os.listdir("download"):
+                ruta_origen = os.path.join("download", file)
+                ruta_destino = os.path.join("img", "instagram", file)
+                
+                if file.endswith(".mp4") or file.endswith(".png") or file.endswith(".jpg") or file.endswith(".jpeg"):
+                    os.rename(ruta_origen, ruta_destino)
+                    await ctx.send(file=discord.File(f"img/instagram/{file}"))
+                else:
+                    os.remove(ruta_origen)
+            
+            os.rmdir("download")
+        else:
+            await ctx.send(embed=discord.Embed(description=f"❌ El enlace no es una publicación en Instagram, utiliza el comando `/reel` para un Reel en Instagram.", color=COLOR), ephemeral=True)
+    @instagram.error
+    async def instagram_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=createEmbedInfo("instaimg", "Descarga y envia imagenes de un enlace en **Instagram**", "!instaimg 'url'", ctx.author.avatar))
+        await ctx.send(embed=createEmbedInfo("instagram", "Descarga y envia imagenes/videos de una publicación en **Instagram**", "!instagram 'url'", ctx.author.avatar))
 
     # Comando para descargar y enviar un video de Twitter
     @commands.hybrid_command(name="twitter", description="Comando para descargar y enviar un video de Twitter (X)")
