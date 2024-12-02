@@ -17,6 +17,8 @@ load_dotenv()
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 INSTAGRAM_USER = os.getenv("INSTAGRAM_USER")
 
+pyk.specify_browser('firefox')
+
 # Clase principal
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -191,7 +193,6 @@ class Utility(commands.Cog):
     @app_commands.describe(enlace = "Enlace de TikTok")
     async def tiktok(self, ctx, enlace : str):
         await ctx.defer()
-        pyk.specify_browser('brave')
         try:
             pyk.save_tiktok(enlace, True)
             await ctx.send(file=discord.File("video/tiktok.mp4"))
