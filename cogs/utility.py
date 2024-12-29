@@ -224,6 +224,10 @@ class Utility(commands.Cog):
             # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
             reel.load_session_from_file(INSTAGRAM_USER)
             
+            # Modificamos el enlace en caso de tener el acortador /share/
+            if "/share/" in enlace:
+                enlace = requests.head(enlace, allow_redirects=True).url
+            
             # Extraer el shortcode de la URL
             shortcode = enlace.split("/")[-2]
             
