@@ -8,6 +8,7 @@ from urllib.parse import urlparse
 import yt_dlp
 import pyktok as pyk
 import instaloader
+import shutil
 import os
 from dotenv import load_dotenv
 
@@ -213,16 +214,16 @@ class Utility(commands.Cog):
         if "/reel/" in enlace or "/reels/" in enlace:
             await ctx.defer()
             
-            # Comprobación para eliminar la carpeta "download" y evitar errores
-            if os.path.isdir("download"):
-                os.rmdir("download")
-            
             # Crear una instancia de Instaloader
             reel = instaloader.Instaloader()
             
             # Iniciamos sesion en Intagram
             # IMPORTANTE TENER TU ARCHIVO DE INICIO DE SESION CON INSTALOADER
             reel.load_session_from_file(INSTAGRAM_USER)
+            
+            # Modificamos el enlace en caso de tener el acortador /share/
+            if "/share/" in enlace:
+                enlace = requests.head(enlace, allow_redirects=True).url
             
             # Extraer el shortcode de la URL
             shortcode = enlace.split("/")[-2]
@@ -303,10 +304,6 @@ class Utility(commands.Cog):
     async def instagram(self, ctx, enlace : str):
         if "/p/" in enlace:
             await ctx.defer()
-            
-            # Comprobación para eliminar la carpeta "download" y evitar errores
-            if os.path.isdir("download"):
-                os.rmdir("download")
             
             # Crear una instancia de Instaloader
             reel = instaloader.Instaloader()
