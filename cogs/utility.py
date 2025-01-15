@@ -8,7 +8,6 @@ from urllib.parse import urlparse
 import yt_dlp
 import pyktok as pyk
 import instaloader
-import shutil
 import os
 from dotenv import load_dotenv
 
@@ -214,6 +213,10 @@ class Utility(commands.Cog):
         if "/reel/" in enlace or "/reels/" in enlace:
             await ctx.defer()
             
+            # Comprobación para eliminar la carpeta "download" y evitar errores
+            if os.path.isdir("download"):
+                os.rmdir("download")
+            
             # Crear una instancia de Instaloader
             reel = instaloader.Instaloader()
             
@@ -304,6 +307,10 @@ class Utility(commands.Cog):
     async def instagram(self, ctx, enlace : str):
         if "/p/" in enlace:
             await ctx.defer()
+            
+            # Comprobación para eliminar la carpeta "download" y evitar errores
+            if os.path.isdir("download"):
+                os.rmdir("download")
             
             # Crear una instancia de Instaloader
             reel = instaloader.Instaloader()
