@@ -80,6 +80,29 @@ class Moderation(commands.Cog):
         else:
             await ctx.send(embed=createEmbedInfo("ban", "**Banea** del servidor a la persona indicada", "!ban '@miembro' 'razón'", "!ban @Albert Demasiadas llamadas de atención", ctx.author.avatar))
 
+    # Comando para remover el baneo de un usuario
+    @commands.hybrid_command(name="unban", description="Remueve el baneo de un usuario")
+    @commands.has_guild_permissions(ban_members=True)
+    @app_commands.describe(id="ID del miembro a remover su baneo")
+    async def unban(self, ctx, id: int):
+        # Obtenemos al usuario a partir de su ID
+        usuario = await ctx.bot.fetch_user(id)
+        # Removemos el baneo
+        try:
+            await ctx.guild.unban(usuario)
+            embed = embed=discord.Embed(description = f"Se ha **removido** el **baneo** del usuario {usuario.mention}", color = COLOR)
+            embed.set_author(name = ctx.author.display_name, icon_url = ctx.author.avatar)
+            embed.set_thumbnail(url=usuario.avatar)
+            await ctx.send(embed=embed)
+        except:
+            await ctx.send(embed=discord.Embed(description = "❌ No se ha podido remover el baneo", color = COLOR))
+    @unban.error
+    async def unban_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
+        else:
+            await ctx.send(embed=createEmbedInfo("unban", "**Remueve** el **baneo** de un usuario mediante su ID", "!unban 'id'", "!unban 200393923456781386", ctx.author.avatar))
+
     # Comando para silenciar a un miembro del servidor
     @commands.hybrid_command(name="mute", description="Silencia a un miembro del servidor")
     @commands.has_guild_permissions(manage_messages=True)
