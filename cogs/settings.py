@@ -21,7 +21,7 @@ class Settings(commands.Cog):
         embed.add_field(name=f"🔧 Utilidad", value="`avatar`, `say`, `emoji`, `fxtwitter`, `reemplazar`", inline=False)
         embed.add_field(name=f"🖼️ Multimedia", value="`youtube`, `twitter`, `tiktok`, `reel`, `instagram`, `imgur`", inline=False)
         embed.add_field(name=f"🎨 Entretenimiento", value="`apuntar`, `quieres`, `logro`, `love`", inline=False)
-        embed.add_field(name=f"🛠️ Moderación", value="`prune`, `kick`, `ban`, `mute`, `unmute`", inline=False)
+        embed.add_field(name=f"🛠️ Moderación", value="`prune`, `kick`, `ban`, `unban`, `mute`, `unmute`", inline=False)
         embed.add_field(name=f"<:kakera:1260465357085474968> Mudae", value="`embedcolor`, `cortarimagen`, `cortargif`, `tiemporestante`, `kakera`, `personajes`", inline=False)
 
         embed.set_image(url="https://i.imgur.com/SOZfVMH.jpeg")
