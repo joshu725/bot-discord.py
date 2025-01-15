@@ -40,7 +40,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:
-            await ctx.send(embed=createEmbedInfo("prune", "**Elimina** la cantidad de mensajes especificada", "!prune 'cantidad'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("prune", "**Elimina** la cantidad de mensajes especificada", "!prune 'cantidad'", "!prune 10", ctx.author.avatar))
 
     # Comando para expulsar a un miembro del servidor
     @commands.hybrid_command(name="kick", description="Expulsa a un miembro del servidor")
@@ -59,7 +59,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:
-            await ctx.send(embed=createEmbedInfo("kick", "**Expulsa** del servidor a la persona indicada", "!kick '@miembro' 'razón'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("kick", "**Expulsa** del servidor a la persona indicada", "!kick '@miembro' 'razón'", "!kick @Albert Molestar en exceso", ctx.author.avatar))
 
     # Comando para banear a un miembro del servidor
     @commands.hybrid_command(name="ban", description="Banea a un miembro del servidor")
@@ -78,7 +78,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:
-            await ctx.send(embed=createEmbedInfo("ban", "**Banea** del servidor a la persona indicada", "!ban '@miembro' 'razón'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("ban", "**Banea** del servidor a la persona indicada", "!ban '@miembro' 'razón'", "!ban @Albert Demasiadas llamadas de atención", ctx.author.avatar))
 
     # Comando para silenciar a un miembro del servidor
     @commands.hybrid_command(name="mute", description="Silencia a un miembro del servidor")
@@ -103,7 +103,7 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:
-            await ctx.send(embed=createEmbedInfo("mute", "**Silencia** del servidor a la persona indicada", "!mute '@miembro' 'duración : 1s 1m 1h 1d' 'razón'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("mute", "**Silencia** del servidor a la persona indicada", "!mute '@miembro' 'duración : 1s 1m 1h 1d' 'razón'", "!mute @Albert 4h Insultar con frecuencia", ctx.author.avatar))
 
     # Comando para quitar el silencio a un miembro del servidor
     @commands.hybrid_command(name="unmute", description="Desilencia a un miembro del servidor")
@@ -124,13 +124,14 @@ class Moderation(commands.Cog):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:
-            await ctx.send(embed=createEmbedInfo("unmute", "**Desilencia** del servidor a la persona indicada", "!unmute '@miembro'", ctx.author.avatar))
+            await ctx.send(embed=createEmbedInfo("unmute", "**Desilencia** del servidor a la persona indicada", "!unmute '@miembro'", "!unmute @Albert", ctx.author.avatar))
 
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
 
-def createEmbedInfo(comando : str, especificacion : str, formato : str, urlIcono : str):
+def createEmbedInfo(comando : str, especificacion : str, formato : str, ejemplo : str, urlIcono : str):
     embed = discord.Embed(description = especificacion, color = COLOR)
     embed.set_author(name = comando, icon_url = urlIcono)
     embed.add_field(name = "🗒️ Formato", value=f"`{formato}`", inline=False)
+    embed.add_field(name= "✏️ Ejemplo", value=f"`{ejemplo}`", inline=False)
     return embed
