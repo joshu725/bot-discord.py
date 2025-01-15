@@ -20,7 +20,7 @@ class Moderation(commands.Cog):
     
     # Comando para eliminar la cantidad de mensajes especificada
     @commands.hybrid_command(name="prune", description="Elimina la cantidad de mensajes especificada")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_guild_permissions(manage_messages=True)
     @app_commands.describe(cantidad="Cantidad de mensajes que deseas eliminar")
     async def prune(self, ctx, cantidad : commands.Range[int, 1]):
         if cantidad > 100:
@@ -44,7 +44,7 @@ class Moderation(commands.Cog):
 
     # Comando para expulsar a un miembro del servidor
     @commands.hybrid_command(name="kick", description="Expulsa a un miembro del servidor")
-    @commands.has_permissions(kick_members=True)
+    @commands.has_guild_permissions(kick_members=True)
     @app_commands.describe(miembro="Miembro a expulsar", razon="Razón de la expulsión")
     async def kick(self, ctx, miembro: discord.Member, *, razon: Optional[str]):
         await miembro.kick(reason=razon)
@@ -63,7 +63,7 @@ class Moderation(commands.Cog):
 
     # Comando para banear a un miembro del servidor
     @commands.hybrid_command(name="ban", description="Banea a un miembro del servidor")
-    @commands.has_permissions(ban_members=True)
+    @commands.has_guild_permissions(ban_members=True)
     @app_commands.describe(miembro="Miembro a banear", razon="Razón del baneo")
     async def ban(self, ctx, miembro: discord.Member, *, razon: Optional[str]):
         await miembro.ban(reason=razon)
@@ -82,7 +82,7 @@ class Moderation(commands.Cog):
 
     # Comando para silenciar a un miembro del servidor
     @commands.hybrid_command(name="mute", description="Silencia a un miembro del servidor")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_guild_permissions(manage_messages=True)
     @app_commands.describe(miembro="Miembro a silenciar", duracion="Duración del silencio", razon="Razón del silencio")
     async def mute(self, ctx, miembro: discord.Member, duracion : Optional[str]="2h", *, razon: Optional[str]):
         try:
@@ -107,7 +107,7 @@ class Moderation(commands.Cog):
 
     # Comando para quitar el silencio a un miembro del servidor
     @commands.hybrid_command(name="unmute", description="Desilencia a un miembro del servidor")
-    @commands.has_permissions(manage_messages=True)
+    @commands.has_guild_permissions(manage_messages=True)
     @app_commands.describe(miembro="Miembro a desilenciar")
     async def unmute(self, ctx, miembro: discord.Member):
         if not miembro.is_timed_out():
