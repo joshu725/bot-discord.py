@@ -2,7 +2,8 @@
 import discord
 from discord.ext import commands
 from discord import app_commands, utils
-
+import os
+import json
 from humanfriendly import parse_timespan, format_timespan, InvalidTimespan
 from typing import Optional
 from datetime import timedelta
@@ -13,6 +14,10 @@ COLOR = 0xffa3a3
 class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        # Si no existe el archivo de warns, se creará
+        if not os.path.exists("assets/warns.json"):
+            with open("assets/warns.json", "w") as file:
+                json.dump({}, file, indent=4)
     
     @commands.Cog.listener()
     async def on_ready(self):
@@ -149,6 +154,13 @@ class Moderation(commands.Cog):
         else:
             await ctx.send(embed=createEmbedInfo("unmute", "**Desilencia** del servidor a la persona indicada", "!unmute '@miembro'", "!unmute @Albert", ctx.author.avatar))
 
+    # Comando para dar una advertencia a un miembro del servidor
+    @commands.hybrid_command(name="warn", description="Advierte a un miembro del servidor")
+    @commands.has_guild_permissions(kick_members=True)
+    @app_commands.describe(miembro = "Miembro a advertir", razon = "Razon de la advertencia")
+    async def warn(self, ctx, miembro: discord.Member, *, razon: str):
+        print("test")
+    
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
 
