@@ -160,6 +160,12 @@ class Moderation(commands.Cog):
     @app_commands.describe(miembro = "Miembro a advertir", razon = "Razon de la advertencia")
     async def warn(self, ctx, miembro: discord.Member, *, razon: str):
         print("test")
+    @warn.error
+    async def warn_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
+        else:
+            await ctx.send(embed=createEmbedInfo("warn", "**Advierte** a un miembro del servidor", "!warn '@miembro' 'formato de razón'", "!warn @Albert Por decir una palabra prohibida", ctx.author.avatar))
     
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
