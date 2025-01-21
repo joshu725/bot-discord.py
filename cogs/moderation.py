@@ -7,6 +7,7 @@ import json
 from humanfriendly import parse_timespan, format_timespan, InvalidTimespan
 from typing import Optional
 from datetime import timedelta
+import datetime
 
 COLOR = 0xffa3a3
 
@@ -159,7 +160,33 @@ class Moderation(commands.Cog):
     @commands.has_guild_permissions(kick_members=True)
     @app_commands.describe(miembro = "Miembro a advertir", razon = "Razon de la advertencia")
     async def warn(self, ctx, miembro: discord.Member, *, razon: str):
-        print("test")
+        # Cargamos los anteriores datos existentes
+        data = {}
+        with open('assets\\warns.json', 'r') as file:
+            try:
+                data = json.load(file)
+            except json.JSONDecodeError:
+                data = {}
+
+        # Comprobamos que el servidor esté en los datos del JSON
+        server_id = str(ctx.message.guild.id)
+        if server_id not in data:
+            data[server_id] = {}
+
+        # Comprobamos que el usuario esté en los datos del JSON
+        user_id = str(miembro.id)
+        if user_id not in data[server_id]:
+            data[server_id][user_id] = {}
+        
+        warning_id = str(ctx.message.id)
+        data[server_id][user_id][warning_id] = {
+            "date": str(ctx.message.created_at),
+            "by": ctx.message.author.id,
+            "reason": razon
+        }
+        
+        with open('assets\\warns.json', 'w') as file:
+            json.dump(data, file, indent = 4)
     @warn.error
     async def warn_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
