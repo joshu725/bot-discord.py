@@ -178,6 +178,7 @@ class Moderation(commands.Cog):
         if user_id not in data[server_id]:
             data[server_id][user_id] = {}
         
+        # Se agrega la nueva advertencia con su ID correspondiente
         warning_id = str(ctx.message.id)
         data[server_id][user_id][warning_id] = {
             "date": str(ctx.message.created_at),
@@ -185,15 +186,23 @@ class Moderation(commands.Cog):
             "reason": razon
         }
         
+        # Se actualiza el .json
         with open('assets\\warns.json', 'w') as file:
             json.dump(data, file, indent = 4)
+        
+        # Se envia el mensaje para confirmar que el usuario fue advertido
+        embed = embed=discord.Embed(description = f"{miembro.mention} ha sido **advertido**", color = COLOR)
+        embed.set_author(name = ctx.author.display_name, icon_url = ctx.author.avatar)
+        embed.set_thumbnail(url=miembro.avatar)
+        embed.add_field(name = "✏️ Razón", value=razon, inline=False)
+        await ctx.send(embed=embed)
     @warn.error
     async def warn_error(self, ctx, error):
         if isinstance(error, commands.MissingPermissions):
             await ctx.send(embed=discord.Embed(description = "❌ No tienes los permisos necesarios para realizar eso", color = COLOR))
         else:
             await ctx.send(embed=createEmbedInfo("warn", "**Advierte** a un miembro del servidor", "!warn '@miembro' 'formato de razón'", "!warn @Albert Por decir una palabra prohibida", ctx.author.avatar))
-    
+
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
 
