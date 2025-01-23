@@ -15,8 +15,8 @@ class Moderation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # Si no existe el archivo de warns, se creará
-        if not os.path.exists("assets/warns.json"):
-            with open("assets/warns.json", "w") as file:
+        if not os.path.exists("assets/warnings.json"):
+            with open("assets/warnings.json", "w") as file:
                 json.dump({}, file, indent=4)
     
     @commands.Cog.listener()
@@ -207,7 +207,7 @@ class Moderation(commands.Cog):
     @app_commands.describe(miembro = "Miembro a visualizar sus advertencias")
     async def warnings(self, ctx, miembro: discord.Member):
         # Abrir el archivo JSON
-        with open('assets\\warns.json', 'r') as file:
+        with open('assets\\warnings.json', 'r') as file:
             data = json.load(file)
         
         # Comprobar si el servidor y el miembro existen en el JSON
