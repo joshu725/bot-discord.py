@@ -203,9 +203,9 @@ class Moderation(commands.Cog):
             await ctx.send(embed=createEmbedInfo("warn", "**Advierte** a un miembro del servidor", "!warn '@miembro' 'formato de razón'", "!warn @Albert Por decir una palabra prohibida", ctx.author.avatar))
 
     # Comando para ver una lista de las advertencias que tiene un miembro del servidor
-    @commands.hybrid_command(name="warnlist", description="Permite ver una lista de las advertencias que tiene un miembro del servidor", aliases=['wl'])
+    @commands.hybrid_command(name="warnings", description="Permite ver una lista de las advertencias que tiene un miembro del servidor")
     @app_commands.describe(miembro = "Miembro a visualizar sus advertencias")
-    async def warnlist(self, ctx, miembro: discord.Member):
+    async def warnings(self, ctx, miembro: discord.Member):
         # Abrir el archivo JSON
         with open('assets\\warns.json', 'r') as file:
             data = json.load(file)
@@ -214,33 +214,35 @@ class Moderation(commands.Cog):
         guild_id = str(ctx.message.guild.id)
         miembro_id = str(miembro.id)
         if guild_id not in data or miembro_id not in data[guild_id] or not data[guild_id][miembro_id]:
-            await ctx.send(embed=discord.Embed(description = f"{miembro.mention} no tiene advertencias", color = COLOR))
+            await ctx.send(embed=discord.Embed(description = f"📄 {miembro.mention} no tiene advertencias", color = COLOR), ephemeral=True)
             return
+        
+        # Se guarda las advertencias que tiene el usuario en una variable
+        advertencias = data[guild_id][miembro_id]
         
         # Crear el embed
         embed = embed=discord.Embed(color = COLOR)
-        embed.set_author(name = "Lista de advertencias de " + miembro.display_name, icon_url = miembro.avatar)
+        embed.set_author(name = f"El usuario {miembro.display_name} tiene {len(advertencias)} advertencias", icon_url = miembro.avatar)
         
         # Iterar sobre las advertencias del miembro
-        advertencias = data[guild_id][miembro_id]
-        for i, (warn_id, warn_data) in enumerate(advertencias.items(), start=1):
-            razon = warn_data.get("reason")
-            moderador = f"<@{warn_data.get('by')}>"
-            # Convertir la fecha en DD-MM-YYYY
-            fecha = datetime.fromisoformat(warn_data.get("date").split("+")[0])
-            fecha = fecha.strftime("%d-%m-%Y")
-
+        for warn_id, warn in advertencias.items():
+            razon = warn.get("reason")
+            moderador = await ctx.bot.fetch_user(warn.get("by"))
+            
+            # Primero convertimos nuestra fecha str en objeto datetime, despues lo pasamos a formato epoch para poder usarlo directamente como un timestamp en el embed
+            fechaEpoch = int((datetime.fromisoformat(warn.get("date"))).timestamp())
+            
             embed.add_field(
-                name=f"Advertencia {i}",
-                value=f"**Razón:** {razon}\n**Moderador:** {moderador}\n**Fecha:** {fecha}",
+                name=f"👤 {moderador.display_name}",
+                value=f"{razon} - <t:{fechaEpoch}:R>",
                 inline=False
             )
-
-        await ctx.send(embed=embed)
-    @warnlist.error
-    async def warnlist_error(self, ctx, error):
+        
+        await ctx.send(embed=embed, ephemeral=True)
+    @warnings.error
+    async def warnings_error(self, ctx, error):
         print(error)
-        await ctx.send(embed=createEmbedInfo("warnlist", "Permite ver una **lista** de las **advertencias** que tiene un miembro", "!warnlist '@miembro'", "!wl @Albert", ctx.author.avatar))
+        await ctx.send(embed=createEmbedInfo("warnings", "Permite ver una **lista** de las **advertencias** que tiene un miembro", "!warnings '@miembro'", "!warnings @Albert", ctx.author.avatar), ephemeral=True)
 
 async def setup(bot):
     await bot.add_cog(Moderation(bot))
