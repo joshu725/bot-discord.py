@@ -302,10 +302,6 @@ class Utility(commands.Cog):
         if "/p/" in enlace:
             await ctx.defer()
             
-            # Comprobación para eliminar la carpeta "download" y evitar errores
-            if os.path.isdir("download"):
-                os.rmdir("download")
-            
             # Crear una instancia de Instaloader
             reel = instaloader.Instaloader()
             
@@ -337,7 +333,6 @@ class Utility(commands.Cog):
                 else:
                     os.remove(ruta_origen)
             
-            os.rmdir("download")
         else:
             await ctx.send(embed=discord.Embed(description=f"❌ El enlace no es una publicación en Instagram, utiliza el comando `/reel` para un Reel en Instagram.", color=COLOR), ephemeral=True)
     @instagram.error
