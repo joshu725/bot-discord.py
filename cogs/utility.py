@@ -78,25 +78,12 @@ class Utility(commands.Cog):
         await ctx.defer()
         # Función para verificar validez del enlace y dominio
         def verificar_enlace(url):
-            try:
-                # Verificar si el dominio es "x.com"
-                parsed_url = urlparse(url)
-                if parsed_url.netloc != "x.com":
-                    return "El enlace no pertenece a 'x.com'"
-                
-                # Encabezados para la solicitud
-                headers = {
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
-                }
-                
-                # Verificar si el enlace es válido
-                response = requests.get(url, headers=headers, allow_redirects=True)
-                if response.status_code == 200:
-                    return "El enlace es válido"
-                else:
-                    return f"El enlace no es válido, código de estado: {response.status_code}"
-            except requests.RequestException as e:
-                return f"Ocurrió un error al verificar el enlace: {e}"
+            # Verificar si el dominio es "x.com"
+            parsed_url = urlparse(url)
+            if parsed_url.netloc != "x.com":
+                return "El enlace no pertenece a 'x.com'"
+            else:
+                return "El enlace es válido"
 
         # Verificación del enlace
         resultado = verificar_enlace(enlace)
