@@ -17,8 +17,6 @@ load_dotenv()
 IMGUR_CLIENT_ID = os.getenv("IMGUR_CLIENT_ID")
 INSTAGRAM_USER = os.getenv("INSTAGRAM_USER")
 
-pyk.specify_browser('firefox')
-
 # Clase principal
 class Utility(commands.Cog):
     def __init__(self, bot):
@@ -125,7 +123,8 @@ class Utility(commands.Cog):
         try:
             ydl_opts = {
                 'format': 'bestvideo[height<=720][vcodec^=avc1]+bestaudio/best',
-                'outtmpl': f'video/youtube.%(ext)s'
+                'outtmpl': f'video/youtube.%(ext)s',
+                'merge_output_format': 'mp4'
             }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                 ydl.download([enlace])
