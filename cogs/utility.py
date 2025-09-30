@@ -164,10 +164,11 @@ class Utility(commands.Cog):
             }
             
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info_dict = ydl.extract_info(enlace, download=False)
-                file_path = ydl.prepare_filename(info_dict).replace('.m4a', '.mp3')
-                ydl.download([enlace])
-
+                info_dict = ydl.extract_info(enlace, download=True)
+                # Nombre final después de conversión
+                filename_base = ydl.prepare_filename(info_dict)
+                file_path = os.path.splitext(filename_base)[0] + ".mp3"
+                
             await ctx.send(file=discord.File(file_path))
         except:
             await ctx.send(embed=discord.Embed(description=f"❌ Error al descargar el audio del video", color=COLOR), ephemeral=True)
