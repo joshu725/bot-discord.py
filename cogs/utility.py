@@ -150,6 +150,9 @@ class Utility(commands.Cog):
     @app_commands.describe(enlace = "Enlace de Youtube")
     async def mp3youtube(self, ctx, enlace : str):
         await ctx.defer()
+        
+        # Se guarda el enlace en ctx para usarlo mas adelante en el error
+        ctx.link = enlace
 
         try:
             ydl_opts = {
@@ -175,8 +178,10 @@ class Utility(commands.Cog):
     @mp3youtube.error
     async def mp3youtube_error(self, ctx, error):
         print(error)
+        # Se obtiene el enlace usado en el comando
+        enlace = getattr(ctx, "link", "Enlace")
         if str(error) == "Hybrid command raised an error: Command 'mp3youtube' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El audio pesa más de 10 MB", color=COLOR), ephemeral=True)
+            await ctx.send(enlace, embed=discord.Embed(description=f"❌ El audio pesa más de 10 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("mp3youtube", "Descarga y envía el audio de un video de **YouTube**", "!mp3youtube 'url'", ctx.author.avatar))
 
@@ -185,6 +190,10 @@ class Utility(commands.Cog):
     @app_commands.describe(enlace = "Enlace de TikTok")
     async def tiktok(self, ctx, enlace : str):
         await ctx.defer()
+        
+        # Se guarda el enlace en ctx para usarlo mas adelante en el error
+        ctx.link = enlace
+        
         try:
             pyk.save_tiktok(enlace, True)
             await ctx.send(file=discord.File("video/tiktok.mp4"))
@@ -193,8 +202,10 @@ class Utility(commands.Cog):
     @tiktok.error
     async def tiktok_error(self, ctx, error):
         print(error)
+        # Se obtiene el enlace usado en el comando
+        enlace = getattr(ctx, "link", "Enlace")
         if str(error) == "Hybrid command raised an error: Command 'tiktok' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 10 MB", color=COLOR), ephemeral=True)
+            await ctx.send(enlace, embed=discord.Embed(description=f"❌ El vídeo pesa más de 10 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("tiktok", "Descarga y envía un video de **TikTok**", "!tiktok 'url'", ctx.author.avatar))
 
@@ -204,6 +215,9 @@ class Utility(commands.Cog):
     async def reel(self, ctx, enlace : str):
         if "/reel/" in enlace or "/reels/" in enlace:
             await ctx.defer()
+            
+            # Se guarda el enlace en ctx para usarlo mas adelante en el error
+            ctx.link = enlace
             
             # Modificamos el enlace en caso de tener el acortador /share/
             if "/share/" in enlace:
@@ -238,8 +252,10 @@ class Utility(commands.Cog):
     @reel.error
     async def reel_error(self, ctx, error):
         print(error)
+        # Se obtiene el enlace usado en el comando
+        enlace = getattr(ctx, "link", "Enlace")
         if str(error) == "Hybrid command raised an error: Command 'reel' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El Reel pesa más de 10 MB", color=COLOR), ephemeral=True)
+            await ctx.send(enlace, embed=discord.Embed(description=f"❌ El Reel pesa más de 10 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("reel", "Descarga y envía un Reel en **Instagram**", "!reel 'url'", ctx.author.avatar))
 
@@ -324,6 +340,9 @@ class Utility(commands.Cog):
     async def twitter(self, ctx, enlace : str):
         await ctx.defer()
         
+        # Se guarda el enlace en ctx para usarlo mas adelante en el error
+        ctx.link = enlace
+        
         if os.path.exists("video/twitter.mp4"):
             os.remove("video/twitter.mp4")
         
@@ -341,8 +360,10 @@ class Utility(commands.Cog):
     @twitter.error
     async def twitter_error(self, ctx, error):
         print(error)
+        # Se obtiene el enlace usado en el comando
+        enlace = getattr(ctx, "link", "Enlace")
         if str(error) == "Hybrid command raised an error: Command 'twitter' raised an exception: HTTPException: 413 Payload Too Large (error code: 40005): Request entity too large":
-            await ctx.send(embed=discord.Embed(description=f"❌ El vídeo pesa más de 10 MB", color=COLOR), ephemeral=True)
+            await ctx.send(enlace, embed=discord.Embed(description=f"❌ El vídeo pesa más de 10 MB", color=COLOR), ephemeral=True)
         else:
             await ctx.send(embed=createEmbedInfo("twitter", "Descarga y envía un video de **Twitter** (X)", "!twitter 'url'", ctx.author.avatar))
 
