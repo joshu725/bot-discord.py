@@ -6,3 +6,4 @@ audio/
 assets/bitesthedust.json
 assets/warns.json
 download/
+cogs/private.py
